@@ -4,13 +4,27 @@ export class BooksController {
   constructor(model, view) {
     this.model = model;
     this.view = view;
+    this.model.setAllBooks(books);
 
-    this.init();
+    this.updateView();
   }
 
-  init() {
-    this.model.addAllBooks(books);
+  changePage(page) {
+    this.model.setPage(page);
+    this.updateView();
+  }
+
+  updateView() {
     this.view.render(this.model.getBooks());
+
+    const totalPages = Math.ceil(
+      this.model.allBooks.length / this.model.perPage
+    );
+    this.view.renderPagination(
+      totalPages,
+      this.model.currentPage,
+      this.changePage.bind(this)
+    );
   }
 }
 

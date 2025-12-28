@@ -1,6 +1,7 @@
 export class BooksView {
   constructor(container, addBook, onDelete, onEdit, onDetails) {
     this.container = container;
+    this.onPageChange = null;
     /*    this.addBook = addBook;
     this.onDelete = onDelete;
     this.onEdit = onEdit;
@@ -13,7 +14,7 @@ export class BooksView {
   </div>
 </td>`;
     setTimeout(() => {
-      this.container.innerHTML = ''; // очищаємо контейнер
+      this.container.innerHTML = '';
 
       books.forEach((book, index) => {
         // створюємо рядок таблиці
@@ -61,19 +62,43 @@ export class BooksView {
         // додаємо рядок у таблицю
         this.container.appendChild(tr);
       });
-    }, 700);
+    }, 500);
+  }
+  renderPagination(totalPages, currentPage, onPageChange) {
+    console.log(totalPages);
+    let paginationContainer = document.getElementById('pagination');
+    if (!paginationContainer) {
+      paginationContainer = document.createElement('ul');
+      paginationContainer.id = 'pagination';
+      paginationContainer.className = 'pagination justify-content-center';
+      this.container.parentNode.appendChild(paginationContainer);
+    }
+    paginationContainer.innerHTML = '';
+
+    for (let i = 1; i <= totalPages; i++) {
+      const li = document.createElement('li');
+      li.className = `page-item ${i === currentPage ? 'active' : ''}`;
+
+      const btn = document.createElement('button');
+      btn.className = 'page-link';
+      btn.textContent = i;
+      btn.addEventListener('click', () => onPageChange(i));
+
+      li.appendChild(btn);
+      paginationContainer.appendChild(li);
+    }
 
     /*     const nav = createElement('nav');
-    const navList = createElement('ul');
-    navList.classList.add('pagination justify-content-center');
-    navList.id = 'pagination';
-    nav.appendChild(navList);
-    for (let i = currentPage; i <= lastPage; i++) {
-      const buttonPage = createElement('button');
-      buttonPage.textContent = currentPage;
-      buttonPage.classList.add = 'page-link';
-      navList.appendChild(`<li>${buttonPage}</li>`);
-    } */
+      const navList = createElement('ul');
+      navList.classList.add('pagination justify-content-center');
+      navList.id = 'pagination';
+      nav.appendChild(navList);
+      for (let i = currentPage; i <= lastPage; i++) {
+        const buttonPage = createElement('button');
+        buttonPage.textContent = currentPage;
+        buttonPage.classList.add = 'page-link';
+        navList.appendChild(`<li>${buttonPage}</li>`);
+      } */
   }
 }
 

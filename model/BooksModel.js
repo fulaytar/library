@@ -3,16 +3,24 @@ export class BooksModel {
     this.books = [];
     this.currentPage = 1;
     this.perPage = 10;
+    this.allBooks = [];
   }
 
-  addAllBooks(allBooks) {
-    const start = (this.currentPage - 1) * this.perPage; // перший елемент сторінки
-    const end = start + this.perPage; // після останнього елемента
-    const sortedPage = allBooks.slice(start, end); // беремо тільки поточну сторінку
-
-    this.books = [...sortedPage];
+  setAllBooks(allBooks) {
+    this.allBooks = allBooks;
+    this.setPage(1);
   }
 
+  setPage(page) {
+    const totalPages = Math.ceil(this.allBooks.length / this.perPage);
+    if (page < 1) page = 1;
+    if (page > totalPages) page = totalPages;
+    this.currentPage = page;
+
+    const start = (this.currentPage - 1) * this.perPage;
+    const end = start + this.perPage;
+    this.books = this.allBooks.slice(start, end);
+  }
   addBook(book) {
     this.books.push(book);
   }
