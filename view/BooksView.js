@@ -7,10 +7,10 @@ export class BooksView {
     this.onEdit = onEdit;
     this.onDetails = onDetails; */
   }
-  render(books) {
+  render(books, currentPage, perPage) {
     this.container.innerHTML = `<td colspan="3" style="height:100px; vertical-align:middle;" class="text-center">
   <div class="spinner-border text-primary" role="status">
-    <span class="visually-hidden">Завантаження...</span>
+    <span class="visually-hidden">Loading...</span>
   </div>
 </td>`;
     setTimeout(() => {
@@ -23,7 +23,8 @@ export class BooksView {
         // номер
         const th = document.createElement('th');
         th.scope = 'row';
-        th.textContent = index + 1;
+        th.textContent = index + 1 + (currentPage - 1) * perPage;
+        console.log(currentPage);
 
         // назва книги
         const tdTitle = document.createElement('td');
@@ -65,7 +66,6 @@ export class BooksView {
     }, 500);
   }
   renderPagination(totalPages, currentPage, onPageChange) {
-    console.log(totalPages);
     let paginationContainer = document.getElementById('pagination');
     if (!paginationContainer) {
       paginationContainer = document.createElement('ul');
@@ -74,6 +74,20 @@ export class BooksView {
       this.container.parentNode.appendChild(paginationContainer);
     }
     paginationContainer.innerHTML = '';
+
+    //button back ⬅
+    const backElement = document.createElement('li');
+    backElement.classList.add('page-item');
+    if (currentPage === 1) backElement.classList.add('disabled');
+    const btnBackElement = document.createElement('button');
+    btnBackElement.className = 'page-link';
+    btnBackElement.textContent = '<';
+    btnBackElement.addEventListener('click', () => {
+      onPageChange(currentPage - 1);
+    });
+    backElement.appendChild(btnBackElement);
+    paginationContainer.appendChild(backElement);
+    // end button back ⬅
 
     for (let i = 1; i <= totalPages; i++) {
       const li = document.createElement('li');
@@ -87,18 +101,22 @@ export class BooksView {
       li.appendChild(btn);
       paginationContainer.appendChild(li);
     }
+    console.log();
+    //button next ⭢
+    const nextElement = document.createElement('li');
+    nextElement.classList.add('page-item');
+    if (currentPage === totalPages) nextElement.classList.add('disabled');
 
-    /*     const nav = createElement('nav');
-      const navList = createElement('ul');
-      navList.classList.add('pagination justify-content-center');
-      navList.id = 'pagination';
-      nav.appendChild(navList);
-      for (let i = currentPage; i <= lastPage; i++) {
-        const buttonPage = createElement('button');
-        buttonPage.textContent = currentPage;
-        buttonPage.classList.add = 'page-link';
-        navList.appendChild(`<li>${buttonPage}</li>`);
-      } */
+    const btnNextElement = document.createElement('button');
+    btnNextElement.className = 'page-link';
+    btnNextElement.textContent = '>';
+    btnNextElement.addEventListener('click', () => {
+      onPageChange(currentPage + 1);
+    });
+    console.log(totalPages, currentPage);
+    nextElement.appendChild(btnNextElement);
+    paginationContainer.appendChild(nextElement);
+    // end button back ⬅
   }
 }
 
