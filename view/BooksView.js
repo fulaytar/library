@@ -75,22 +75,6 @@ export class BooksView {
     }
     paginationContainer.innerHTML = '';
 
-    //button back ⬅⬅
-    if (currentPage > 2) {
-      const toFirtElement = document.createElement('li');
-      toFirtElement.classList.add('page-item');
-      if (currentPage === 1) toFirtElement.classList.add('disabled');
-      const btnToFirtElement = document.createElement('button');
-      btnToFirtElement.className = 'page-link';
-      btnToFirtElement.textContent = '<<';
-      btnToFirtElement.addEventListener('click', () => {
-        onPageChange(1);
-      });
-      toFirtElement.appendChild(btnToFirtElement);
-      paginationContainer.appendChild(toFirtElement);
-    }
-    // end button back ⬅⬅
-
     //button firt pages ⬅
     const firstPage = document.createElement('li');
     firstPage.classList.add('page-item');
@@ -117,7 +101,7 @@ export class BooksView {
       pages.push(1);
 
       // left ellipsis
-      if (currentPage > 4) {
+      if (currentPage >= 4) {
         pages.push('...');
       }
 
@@ -129,7 +113,7 @@ export class BooksView {
       }
 
       // right ellipsis
-      if (currentPage < totalPages - 3) {
+      if (currentPage <= totalPages - 3) {
         pages.push('...');
       }
 
@@ -179,21 +163,6 @@ export class BooksView {
     nextElement.appendChild(btnNextElement);
     paginationContainer.appendChild(nextElement);
     // end button back ⬅
-
-    if (currentPage !== totalPages) {
-      const toLastPage = document.createElement('li');
-      toLastPage.classList.add('page-item');
-      if (currentPage === totalPages) toLastPage.classList.add('disabled');
-
-      const btnToLastPage = document.createElement('button');
-      btnToLastPage.className = 'page-link';
-      btnToLastPage.textContent = '>>';
-      btnToLastPage.addEventListener('click', () => {
-        onPageChange(totalPages);
-      });
-      toLastPage.appendChild(btnToLastPage);
-      paginationContainer.appendChild(toLastPage);
-    }
   }
 }
 
