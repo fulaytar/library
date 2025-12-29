@@ -1,11 +1,8 @@
 export class BooksView {
-  constructor(container, addBook, onDelete, onEdit, onDetails) {
+  constructor(container) {
     this.container = container;
     this.onPageChange = null;
-    /*    this.addBook = addBook;
-    this.onDelete = onDelete;
-    this.onEdit = onEdit;
-    this.onDetails = onDetails; */
+    this.onSearch = null;
   }
   render(books, currentPage, perPage) {
     this.container.innerHTML = `<td colspan="3" style="height:100px; vertical-align:middle;" class="text-center">
@@ -24,41 +21,15 @@ export class BooksView {
         const th = document.createElement('th');
         th.scope = 'row';
         th.textContent = index + 1 + (currentPage - 1) * perPage;
-        console.log(currentPage);
 
         // назва книги
         const tdTitle = document.createElement('td');
         tdTitle.textContent = book.title;
         tdTitle.style.cursor = 'pointer';
 
-        /*         // кнопки
-        const tdButtons = document.createElement('td');
-
-        const editBtn = document.createElement('button');
-        editBtn.className = 'btn btn-sm btn-primary mx-1';
-        editBtn.textContent = 'Редагувати';
-        editBtn.addEventListener('click', () => this.onEdit(index));
-
-        const deleteBtn = document.createElement('button');
-        deleteBtn.className = 'btn btn-sm btn-danger';
-        deleteBtn.textContent = 'Видалити';
-        deleteBtn.addEventListener('click', () => this.onDelete(index));
-
-        // Деталі
-        const detailsBtn = document.createElement('button');
-        detailsBtn.className = 'btn btn-sm btn-info mx-1';
-        detailsBtn.textContent = 'Деталі';
-        detailsBtn.addEventListener('click', () => this.onDetails(index));
-
-        // додаємо кнопки в td
-        tdButtons.appendChild(editBtn);
-        tdButtons.appendChild(deleteBtn);
-        tdButtons.appendChild(detailsBtn); */
-
         // збираємо рядок
         tr.appendChild(th);
         tr.appendChild(tdTitle);
-        /*         tr.appendChild(tdButtons); */
 
         // додаємо рядок у таблицю
         this.container.appendChild(tr);
@@ -76,17 +47,20 @@ export class BooksView {
     paginationContainer.innerHTML = '';
 
     //button firt pages ⬅
-    const firstPage = document.createElement('li');
-    firstPage.classList.add('page-item');
-    if (currentPage === 1) firstPage.classList.add('disabled');
-    const btnFirstPage = document.createElement('button');
-    btnFirstPage.className = 'page-link';
-    btnFirstPage.textContent = '<';
-    btnFirstPage.addEventListener('click', () => {
-      onPageChange(currentPage - 1);
-    });
-    firstPage.appendChild(btnFirstPage);
-    paginationContainer.appendChild(firstPage);
+    if (totalPages !== 0) {
+      const firstPage = document.createElement('li');
+      firstPage.classList.add('page-item');
+      if (currentPage === 1) firstPage.classList.add('disabled');
+      const btnFirstPage = document.createElement('button');
+      btnFirstPage.className = 'page-link';
+      btnFirstPage.textContent = '<';
+      btnFirstPage.addEventListener('click', () => {
+        onPageChange(currentPage - 1);
+      });
+      firstPage.appendChild(btnFirstPage);
+      paginationContainer.appendChild(firstPage);
+    }
+
     // end button back ⬅
 
     /* ========= Setting pages ========= */
@@ -150,19 +124,56 @@ export class BooksView {
     /* ========= Setting pages ========= */
 
     //button next ⭢
-    const nextElement = document.createElement('li');
-    nextElement.classList.add('page-item');
-    if (currentPage === totalPages) nextElement.classList.add('disabled');
+    if (totalPages !== 0) {
+      const nextElement = document.createElement('li');
+      nextElement.classList.add('page-item');
+      if (currentPage === totalPages) nextElement.classList.add('disabled');
 
-    const btnNextElement = document.createElement('button');
-    btnNextElement.className = 'page-link';
-    btnNextElement.textContent = '>';
-    btnNextElement.addEventListener('click', () => {
-      onPageChange(currentPage + 1);
-    });
-    nextElement.appendChild(btnNextElement);
-    paginationContainer.appendChild(nextElement);
+      const btnNextElement = document.createElement('button');
+      btnNextElement.className = 'page-link';
+      btnNextElement.textContent = '>';
+      btnNextElement.addEventListener('click', () => {
+        onPageChange(currentPage + 1);
+      });
+      nextElement.appendChild(btnNextElement);
+      paginationContainer.appendChild(nextElement);
+    }
+
     // end button back ⬅
+  }
+  renderSearch() {
+    const form = document.createElement('form');
+    form.className = 'mb-3 mx-auto'; // центрування через margin auto
+    form.style.maxWidth = '400px'; // максимальна ширина
+    form.setAttribute('role', 'search');
+    form.addEventListener('submit', e => e.preventDefault());
+
+    const label = document.createElement('label');
+    label.className = 'visually-hidden';
+    label.setAttribute('for', 'input-search');
+    label.textContent = 'Search';
+
+    const input = document.createElement('input');
+    input.type = 'search';
+    input.id = 'input-search';
+    input.className = 'form-control shadow-sm'; // додаємо легку тінь
+    input.placeholder = 'Search books by title, author, or year';
+    input.style.width = '100%';
+    input.style.borderRadius = '8px'; // закруглення
+    input.style.padding = '8px 12px';
+
+    // обробник пошуку
+    input.addEventListener('input', e => {
+      if (this.onSearch) {
+        this.onSearch(e.target.value);
+      }
+    });
+
+    form.append(label, input);
+
+    // додаємо ПЕРЕД таблицею
+    const prependTable = document.querySelector('#title');
+    prependTable.insertAdjacentElement('afterend', form);
   }
 }
 

@@ -5,7 +5,11 @@ export class BooksController {
     this.model = model;
     this.view = view;
     this.model.setAllBooks(books);
-
+    this.view.renderSearch(); // callback з View → Controller
+    this.view.onSearch = query => {
+      this.model.searchBooks(query);
+      this.updateView();
+    };
     this.updateView();
   }
 
@@ -16,7 +20,7 @@ export class BooksController {
 
   updateView() {
     const totalPages = Math.ceil(
-      this.model.allBooks.length / this.model.perPage
+      this.model.filteredBooks.length / this.model.perPage
     );
     this.view.render(
       this.model.getBooks(),
