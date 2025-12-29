@@ -75,33 +75,96 @@ export class BooksView {
     }
     paginationContainer.innerHTML = '';
 
-    //button back ⬅
-    const backElement = document.createElement('li');
-    backElement.classList.add('page-item');
-    if (currentPage === 1) backElement.classList.add('disabled');
-    const btnBackElement = document.createElement('button');
-    btnBackElement.className = 'page-link';
-    btnBackElement.textContent = '<';
-    btnBackElement.addEventListener('click', () => {
+    //button back ⬅⬅
+    if (currentPage > 2) {
+      const toFirtElement = document.createElement('li');
+      toFirtElement.classList.add('page-item');
+      if (currentPage === 1) toFirtElement.classList.add('disabled');
+      const btnToFirtElement = document.createElement('button');
+      btnToFirtElement.className = 'page-link';
+      btnToFirtElement.textContent = '<<';
+      btnToFirtElement.addEventListener('click', () => {
+        onPageChange(1);
+      });
+      toFirtElement.appendChild(btnToFirtElement);
+      paginationContainer.appendChild(toFirtElement);
+    }
+    // end button back ⬅⬅
+
+    //button firt pages ⬅
+    const firstPage = document.createElement('li');
+    firstPage.classList.add('page-item');
+    if (currentPage === 1) firstPage.classList.add('disabled');
+    const btnFirstPage = document.createElement('button');
+    btnFirstPage.className = 'page-link';
+    btnFirstPage.textContent = '<';
+    btnFirstPage.addEventListener('click', () => {
       onPageChange(currentPage - 1);
     });
-    backElement.appendChild(btnBackElement);
-    paginationContainer.appendChild(backElement);
+    firstPage.appendChild(btnFirstPage);
+    paginationContainer.appendChild(firstPage);
     // end button back ⬅
 
-    for (let i = 1; i <= totalPages; i++) {
+    /* ========= Setting pages ========= */
+    const pages = [];
+
+    if (totalPages <= 7) {
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      // first page
+      pages.push(1);
+
+      // left ellipsis
+      if (currentPage > 4) {
+        pages.push('...');
+      }
+
+      // middle pages (current -1, current, current +1)
+      for (let i = currentPage - 1; i <= currentPage + 1; i++) {
+        if (i > 1 && i < totalPages) {
+          pages.push(i);
+        }
+      }
+
+      // right ellipsis
+      if (currentPage < totalPages - 3) {
+        pages.push('...');
+      }
+
+      // last page
+      pages.push(totalPages);
+    }
+
+    pages.forEach(page => {
+      if (page === '...') {
+        const ellipsis = document.createElement('li');
+        ellipsis.classList.add('page-item', 'disabled');
+
+        const ellipsisSpan = document.createElement('span');
+        ellipsisSpan.classList.add('page-link');
+        ellipsisSpan.textContent = '...';
+
+        ellipsis.appendChild(ellipsisSpan);
+        paginationContainer.appendChild(ellipsis);
+        return;
+      }
+
       const li = document.createElement('li');
-      li.className = `page-item ${i === currentPage ? 'active' : ''}`;
+      li.classList.add('page-item');
+      if (page === currentPage) li.classList.add('active');
 
       const btn = document.createElement('button');
       btn.className = 'page-link';
-      btn.textContent = i;
-      btn.addEventListener('click', () => onPageChange(i));
+      btn.textContent = page;
+      btn.addEventListener('click', () => onPageChange(page));
 
       li.appendChild(btn);
       paginationContainer.appendChild(li);
-    }
-    console.log();
+    });
+    /* ========= Setting pages ========= */
+
     //button next ⭢
     const nextElement = document.createElement('li');
     nextElement.classList.add('page-item');
@@ -113,10 +176,24 @@ export class BooksView {
     btnNextElement.addEventListener('click', () => {
       onPageChange(currentPage + 1);
     });
-    console.log(totalPages, currentPage);
     nextElement.appendChild(btnNextElement);
     paginationContainer.appendChild(nextElement);
     // end button back ⬅
+
+    if (currentPage !== totalPages) {
+      const toLastPage = document.createElement('li');
+      toLastPage.classList.add('page-item');
+      if (currentPage === totalPages) toLastPage.classList.add('disabled');
+
+      const btnToLastPage = document.createElement('button');
+      btnToLastPage.className = 'page-link';
+      btnToLastPage.textContent = '>>';
+      btnToLastPage.addEventListener('click', () => {
+        onPageChange(totalPages);
+      });
+      toLastPage.appendChild(btnToLastPage);
+      paginationContainer.appendChild(toLastPage);
+    }
   }
 }
 
