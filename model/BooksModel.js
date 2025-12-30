@@ -59,21 +59,3 @@ export class BooksModel {
     return this.books[index].details;
   }
 }
-
-/* export class TaskModel {
-  constructor() {
-    this.tasks = [];
-  }
-
-  addTask(task) {
-    this.tasks.push(task);
-  }
-
-  getTasks() {
-    return this.tasks;
-  }
-  deleteTask(index) {
-    this.tasks = this.tasks.filter(element => element !== this.tasks[index]);
-  }
-} */
-//модель працює тільки з даними

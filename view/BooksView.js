@@ -31,10 +31,6 @@ export class BooksView {
         tdTitle.style.overflow = 'hidden';
         tdTitle.style.textOverflow = 'ellipsis';
 
-        // збираємо рядо
-        // <button class="btn btn-sm btn-primary">Редагувати</button>
-        //<button class="btn btn-sm btn-danger">Видалити</button>
-        //<button class="btn btn-sm btn-info">Деталі</button>к
         const tdAButtons = document.createElement('td');
 
         const btnDetails = document.createElement('button');
@@ -223,36 +219,4 @@ export class BooksView {
   }
 }
 
-/* export class TaskView {
-  constructor(container, onDelete) {
-    this.container = container;
-    this.onDelete = onDelete;
-  }
-
-  render(tasks) {
-    this.container.innerHTML = '';
-
-    tasks.forEach((task, index) => {
-      const div = document.createElement('div');
-      div.className =
-        'alert alert-secondary d-flex justify-content-between align-items-center mt-2';
-
-      // текст таску
-      const taskText = document.createElement('span');
-      taskText.textContent = task;
-
-      // кнопка видалення
-      const deleteBtn = document.createElement('button');
-      deleteBtn.textContent = '🗑️';
-      deleteBtn.className = 'btn btn-sm btn-danger';
-      console.log(index);
-      deleteBtn.addEventListener('click', () => this.onDelete(index));
-
-      div.appendChild(taskText);
-      div.appendChild(deleteBtn);
-
-      this.container.appendChild(div);
-    });
-  }
-} */
 //тільки DOM
