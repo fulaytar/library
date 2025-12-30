@@ -53,6 +53,24 @@ export class BooksView {
         btnExport.textContent = 'Export';
         btnExport.className = 'btn btn-sm  btn-outline-success me-1 ';
 
+        const btnAddBook = document.createElement('button');
+        btnAddBook.textContent = 'Add book?';
+        btnAddBook.style.position = 'fixed';
+        btnAddBook.style.bottom = '30px';
+        btnAddBook.style.right = '30px';
+        btnAddBook.style.padding = '10px 20px';
+        btnAddBook.style.backgroundColor = '#6f42c1';
+        btnAddBook.style.color = 'white';
+        btnAddBook.style.border = 'none';
+        btnAddBook.style.borderRadius = '5px';
+        btnAddBook.style.cursor = 'pointer';
+        btnAddBook.style.boxShadow = '0 4px 4px rgba(0,0,0,0.2)';
+        btnAddBook.style.zIndex = '1000';
+        btnAddBook.style.fontSize = '16px';
+
+        // Додаємо кнопку на сторінку
+        document.body.appendChild(btnAddBook);
+
         tdAButtons.append(btnDetails, btnEdit, btnDelete, btnExport);
 
         tr.appendChild(th);
