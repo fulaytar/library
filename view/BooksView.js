@@ -26,10 +26,38 @@ export class BooksView {
         const tdTitle = document.createElement('td');
         tdTitle.textContent = book.title;
         tdTitle.style.cursor = 'pointer';
+        tdTitle.style.maxWidth = '500px';
+        tdTitle.style.whiteSpace = 'nowrap';
+        tdTitle.style.overflow = 'hidden';
+        tdTitle.style.textOverflow = 'ellipsis';
 
-        // збираємо рядок
+        // збираємо рядо
+        // <button class="btn btn-sm btn-primary">Редагувати</button>
+        //<button class="btn btn-sm btn-danger">Видалити</button>
+        //<button class="btn btn-sm btn-info">Деталі</button>к
+        const tdAButtons = document.createElement('td');
+
+        const btnDetails = document.createElement('button');
+        btnDetails.textContent = 'Details';
+        btnDetails.className = 'btn btn-sm btn-info me-1';
+
+        const btnEdit = document.createElement('button');
+        btnEdit.textContent = 'Edit';
+        btnEdit.className = 'btn btn-sm btn-warning me-1';
+
+        const btnDelete = document.createElement('button');
+        btnDelete.textContent = 'Delete';
+        btnDelete.className = 'btn btn-sm btn-danger me-1';
+
+        const btnExport = document.createElement('button');
+        btnExport.textContent = 'Export';
+        btnExport.className = 'btn btn-sm  btn-outline-success me-1 ';
+
+        tdAButtons.append(btnDetails, btnEdit, btnDelete, btnExport);
+
         tr.appendChild(th);
         tr.appendChild(tdTitle);
+        tr.appendChild(tdAButtons);
 
         // додаємо рядок у таблицю
         this.container.appendChild(tr);
