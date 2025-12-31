@@ -5,11 +5,12 @@ export class BooksView {
 
     this.onPageChange = null;
     this.onSearch = null;
-    //Modalka
+
     this.onDetails = null;
     this.onEdit = null;
     this.onDelete = null;
     this.onExport = null;
+    this.onAdd = null;
   }
   render(books, currentPage, perPage) {
     this.container.innerHTML = `<td colspan="3" style="height:100px; vertical-align:middle;" class="text-center">
@@ -21,15 +22,12 @@ export class BooksView {
       this.container.innerHTML = '';
 
       books.forEach((book, index) => {
-        // створюємо рядок таблиці
         const tr = document.createElement('tr');
 
-        // номер
         const th = document.createElement('th');
         th.scope = 'row';
         th.textContent = index + 1 + (currentPage - 1) * perPage;
 
-        // назва книги
         const tdTitle = document.createElement('td');
         tdTitle.textContent = book.title;
         tdTitle.style.cursor = 'pointer';
@@ -63,10 +61,8 @@ export class BooksView {
 
         const btnExport = document.createElement('button');
         btnExport.textContent = 'Export';
-        btnExport.className = 'btn btn-sm  btn-outline-success me-1 ';
-        btnExport.addEventListener('click', () => {
-          this.onExport?.();
-        });
+        btnExport.className = 'btn btn-sm btn-outline-success me-1';
+        btnExport.addEventListener('click', () => this.onExport(index));
 
         const btnAddBook = document.createElement('button');
         btnAddBook.textContent = 'Add book?';
@@ -82,8 +78,8 @@ export class BooksView {
         btnAddBook.style.boxShadow = '0 4px 4px rgba(0,0,0,0.2)';
         btnAddBook.style.zIndex = '1000';
         btnAddBook.style.fontSize = '16px';
+        btnAddBook.addEventListener('click', () => this.onAdd());
 
-        // Додаємо кнопку на сторінку
         document.body.appendChild(btnAddBook);
 
         tdAButtons.append(btnDetails, btnEdit, btnDelete, btnExport);
@@ -92,7 +88,6 @@ export class BooksView {
         tr.appendChild(tdTitle);
         tr.appendChild(tdAButtons);
 
-        // додаємо рядок у таблицю
         this.container.appendChild(tr);
       });
     }, 500);
@@ -107,7 +102,6 @@ export class BooksView {
     }
     paginationContainer.innerHTML = '';
 
-    //button firt pages ⬅
     if (totalPages !== 0) {
       const firstPage = document.createElement('li');
       firstPage.classList.add('page-item');
@@ -122,9 +116,6 @@ export class BooksView {
       paginationContainer.appendChild(firstPage);
     }
 
-    // end button back ⬅
-
-    /* ========= Setting pages ========= */
     const pages = [];
 
     if (totalPages <= 7) {
@@ -132,27 +123,22 @@ export class BooksView {
         pages.push(i);
       }
     } else {
-      // first page
       pages.push(1);
 
-      // left ellipsis
       if (currentPage >= 4) {
         pages.push('...');
       }
 
-      // middle pages (current -1, current, current +1)
       for (let i = currentPage - 1; i <= currentPage + 1; i++) {
         if (i > 1 && i < totalPages) {
           pages.push(i);
         }
       }
 
-      // right ellipsis
       if (currentPage <= totalPages - 3) {
         pages.push('...');
       }
 
-      // last page
       pages.push(totalPages);
     }
 
@@ -182,9 +168,7 @@ export class BooksView {
       li.appendChild(btn);
       paginationContainer.appendChild(li);
     });
-    /* ========= Setting pages ========= */
 
-    //button next ⭢
     if (totalPages !== 0) {
       const nextElement = document.createElement('li');
       nextElement.classList.add('page-item');
@@ -199,13 +183,11 @@ export class BooksView {
       nextElement.appendChild(btnNextElement);
       paginationContainer.appendChild(nextElement);
     }
-
-    // end button back ⬅
   }
   renderSearch() {
     const form = document.createElement('form');
-    form.className = 'mb-3 mx-auto'; // центрування через margin auto
-    form.style.maxWidth = '400px'; // максимальна ширина
+    form.className = 'mb-3 mx-auto';
+    form.style.maxWidth = '400px';
     form.setAttribute('role', 'search');
     form.addEventListener('submit', e => e.preventDefault());
 
@@ -217,13 +199,12 @@ export class BooksView {
     const input = document.createElement('input');
     input.type = 'search';
     input.id = 'input-search';
-    input.className = 'form-control shadow-sm'; // додаємо легку тінь
+    input.className = 'form-control shadow-sm';
     input.placeholder = 'Search books by title, author, or year';
     input.style.width = '100%';
-    input.style.borderRadius = '8px'; // закруглення
+    input.style.borderRadius = '8px';
     input.style.padding = '8px 12px';
 
-    // обробник пошуку
     input.addEventListener('input', e => {
       if (this.onSearch) {
         this.onSearch(e.target.value);
@@ -232,10 +213,8 @@ export class BooksView {
 
     form.append(label, input);
 
-    // додаємо ПЕРЕД таблицею
     const prependTable = document.querySelector('#title');
     prependTable.insertAdjacentElement('afterend', form);
   }
 }
-
 //тільки DOM

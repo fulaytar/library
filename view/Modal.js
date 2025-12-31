@@ -20,7 +20,6 @@ export class Modal {
     modal.className = 'modal fade';
     modal.tabIndex = -1;
 
-    // Вставляємо структуру
     modal.innerHTML = `
       <div class="modal-dialog">
         <div class="modal-content">
@@ -36,7 +35,6 @@ export class Modal {
 
     const footer = modal.querySelector('.modal-footer');
 
-    // Кнопка Cancel
     if (this.cancelText) {
       const btnCancel = document.createElement('button');
       btnCancel.type = 'button';
@@ -46,7 +44,6 @@ export class Modal {
       footer.appendChild(btnCancel);
     }
 
-    // Кнопка Confirm
     const btnConfirm = document.createElement('button');
     btnConfirm.type = 'button';
     btnConfirm.className = 'btn btn-primary';
@@ -62,11 +59,9 @@ export class Modal {
   }
 
   open() {
-    // Створюємо Bootstrap модалку
     this.bsModal = new bootstrap.Modal(this.modalElement);
     this.bsModal.show();
 
-    // Ставимо фокус на Confirm кнопку після відкриття
     const btnConfirm = this.modalElement.querySelector('.btn-primary');
     if (btnConfirm) btnConfirm.focus();
   }

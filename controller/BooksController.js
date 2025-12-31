@@ -2,6 +2,7 @@ import books from '../books.js';
 import { DetailsModal } from '../view/DetailsModal.js';
 import { FormModal } from '../view/FormModal.js';
 import { DeleteModal } from '../view/DeleteModal.js';
+import { AddModal } from '../view/AddModal.js';
 
 export class BooksController {
   constructor(model, view) {
@@ -28,20 +29,60 @@ export class BooksController {
       }).open();
     };
 
+    this.view.onAdd = () => {
+      new AddModal({
+        onConfirm: newBook => {
+          this.model.addBook(newBook);
+          this.updateView();
+        },
+      }).open();
+    };
+
     this.view.onDelete = index => {
       const book = this.model.getBooks()[index];
-      console.log(book);
       new DeleteModal(book, () => {
         this.model.deleteBook(index);
         this.updateView();
       }).open();
     };
+
+    this.view.onExport = index => {
+      const book = this.model.getBooks()[index];
+
+      const text = `
+Title: ${book.title}
+Author: ${book.details.author}
+Year: ${book.year}
+Genre: ${book.details.genre || '-'}
+Pages: ${book.details.pages || '-'}
+  `.trim();
+
+      navigator.clipboard
+        .writeText(text)
+        .then(() => alert(`Book "${book.title}" copied to clipboard!`))
+        .catch(err => console.error('Failed to copy book: ', err));
+    };
+
     this.updateView();
   }
 
   changePage(page) {
     this.model.setPage(page);
     this.updateView();
+  }
+
+  exportBook(index) {
+    const book = this.model.getBooks()[index];
+    const json = JSON.stringify(book, null, 2);
+    navigator.clipboard
+      .writeText(json)
+      .then(() => {
+        alert(`Book "${book.title}" copied to clipboard!`);
+      })
+      .catch(err => {
+        console.error('Failed to copy book: ', err);
+        alert('Failed to copy book!');
+      });
   }
 
   updateView() {
@@ -67,5 +108,4 @@ export class BooksController {
     this.onExport = null;
   }
 }
-
 //слухає події, керує view and model

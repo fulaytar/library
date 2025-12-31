@@ -14,9 +14,6 @@ export class BooksModel {
   }
 
   setPage(page) {
-    /*     console.log(this.books, 'this.books');
-    console.log(this.allBooks, 'this.allBooks');
-    console.log(this.filteredBooks, 'this.filteredBooks'); */
     const totalPages = Math.ceil(this.filteredBooks.length / this.perPage);
     if (page < 1) page = 1;
     if (page > totalPages) page = totalPages;
@@ -44,7 +41,17 @@ export class BooksModel {
   }
 
   addBook(book) {
-    this.books.push(book);
+    if (!book) return;
+
+    const { title, year, details } = book;
+    const { author, genre, pages } = details;
+
+    // Перевіряємо, що обов'язкові поля заповнені
+    if (!title || !year || !author || !genre || !pages) {
+      console.alert('Some required fields are missing. Book was not added.');
+      return;
+    }
+    this.allBooks.push(book);
   }
   deleteBook(index) {
     const globalIndex = (this.currentPage - 1) * this.perPage + index;
@@ -66,4 +73,19 @@ export class BooksModel {
   detailsBook(index) {
     return this.books[index].details;
   }
+  exportBook(index) {
+    const book = this.model.getBooks()[index];
+    const json = JSON.stringify(book, null, 2);
+
+    navigator.clipboard
+      .writeText(json)
+      .then(() => {
+        alert(`Book "${book.title}" copied to clipboard!`);
+      })
+      .catch(err => {
+        console.error('Failed to copy book: ', err);
+        alert('Failed to copy book!');
+      });
+  }
 }
+/* Робота з даними  */
