@@ -48,7 +48,7 @@ export class BooksModel {
 
     // Перевіряємо, що обов'язкові поля заповнені
     if (!title || !year || !author || !genre || !pages) {
-      console.alert('Some required fields are missing. Book was not added.');
+      alert('Some required fields are missing. Book was not added.');
       return;
     }
     this.allBooks.push(book);
