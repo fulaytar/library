@@ -1,6 +1,7 @@
 import books from '../books.js';
 import { DetailsModal } from '../view/DetailsModal.js';
 import { FormModal } from '../view/FormModal.js';
+import { DeleteModal } from '../view/DeleteModal.js';
 
 export class BooksController {
   constructor(model, view) {
@@ -27,13 +28,14 @@ export class BooksController {
       }).open();
     };
 
-    /*     this.view.onDelete = index => {
+    this.view.onDelete = index => {
       const book = this.model.getBooks()[index];
+      console.log(book);
       new DeleteModal(book, () => {
         this.model.deleteBook(index);
         this.updateView();
       }).open();
-    }; */
+    };
     this.updateView();
   }
 

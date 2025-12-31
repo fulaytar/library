@@ -47,13 +47,21 @@ export class BooksModel {
     this.books.push(book);
   }
   deleteBook(index) {
-    this.books.splice(index, 1);
+    const globalIndex = (this.currentPage - 1) * this.perPage + index;
+    this.filteredBooks.splice(globalIndex, 1);
+    this.allBooks.slice(globalIndex, 1);
+    const start = (this.currentPage - 1) * this.perPage;
+    const end = start + this.perPage;
+    this.books = this.filteredBooks.slice(start, end);
   }
   getBooks() {
     return this.books;
   }
   editBook(index, newBook) {
+    const globalIndex = (this.currentPage - 1) * this.perPage + index;
     this.books[index] = newBook;
+    this.allBooks[globalIndex] = newBook;
+    this.filteredBooks[globalIndex] = newBook;
   }
   detailsBook(index) {
     return this.books[index].details;

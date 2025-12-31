@@ -72,6 +72,9 @@ export class Modal {
   }
 
   close() {
-    if (this.bsModal) this.bsModal.hide();
+    this.bsModal.hide();
+    this.modalElement.remove();
+    this.modalElement = null;
+    this.bsModal = null;
   }
 }
