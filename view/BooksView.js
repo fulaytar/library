@@ -1,8 +1,15 @@
 export class BooksView {
   constructor(container) {
     this.container = container;
+    this.renderSearch();
+
     this.onPageChange = null;
     this.onSearch = null;
+    //Modalka
+    this.onDetails = null;
+    this.onEdit = null;
+    this.onDelete = null;
+    this.onExport = null;
   }
   render(books, currentPage, perPage) {
     this.container.innerHTML = `<td colspan="3" style="height:100px; vertical-align:middle;" class="text-center">
@@ -36,18 +43,30 @@ export class BooksView {
         const btnDetails = document.createElement('button');
         btnDetails.textContent = 'Details';
         btnDetails.className = 'btn btn-sm btn-info me-1';
+        btnDetails.addEventListener('click', () => {
+          if (this.onDetails) this.onDetails(index);
+        });
 
         const btnEdit = document.createElement('button');
         btnEdit.textContent = 'Edit';
         btnEdit.className = 'btn btn-sm btn-warning me-1';
+        btnEdit.addEventListener('click', () => {
+          if (this.onEdit) this.onEdit(index);
+        });
 
         const btnDelete = document.createElement('button');
         btnDelete.textContent = 'Delete';
         btnDelete.className = 'btn btn-sm btn-danger me-1';
+        btnDelete.addEventListener('click', () => {
+          if (this.onDelete) this.onDelete(index);
+        });
 
         const btnExport = document.createElement('button');
         btnExport.textContent = 'Export';
         btnExport.className = 'btn btn-sm  btn-outline-success me-1 ';
+        btnExport.addEventListener('click', () => {
+          this.onExport?.();
+        });
 
         const btnAddBook = document.createElement('button');
         btnAddBook.textContent = 'Add book?';

@@ -14,9 +14,9 @@ export class BooksModel {
   }
 
   setPage(page) {
-    console.log(this.books, 'this.books');
+    /*     console.log(this.books, 'this.books');
     console.log(this.allBooks, 'this.allBooks');
-    console.log(this.filteredBooks, 'this.filteredBooks');
+    console.log(this.filteredBooks, 'this.filteredBooks'); */
     const totalPages = Math.ceil(this.filteredBooks.length / this.perPage);
     if (page < 1) page = 1;
     if (page > totalPages) page = totalPages;
