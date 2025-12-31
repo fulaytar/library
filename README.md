@@ -17,7 +17,10 @@ A simple web-based library application to manage books. Users can **view, add, e
 - **HTML & CSS**
 - **Bootstrap 5**
 - **Modular MVC pattern**: Separate Model, View, and Controller
-##Example Book Object
+
+## Example Book Object
+
+```json
 {
   "title": "To Kill a Mockingbird",
   "year": 1960,
