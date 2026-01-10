@@ -45,6 +45,7 @@ export class BooksView {
         tdTitle.appendChild(titleWrap);
 
         const tdAuthor = document.createElement('td');
+        tdAuthor.className = 'w-25';
         const authorWrap = document.createElement('div');
         authorWrap.className = 'text-truncate d-inline-block w-100';
         authorWrap.textContent =
