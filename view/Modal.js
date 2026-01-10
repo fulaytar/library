@@ -55,6 +55,18 @@ export class Modal {
     footer.appendChild(btnConfirm);
 
     document.body.appendChild(modal);
+
+    // Always clean up modal DOM and Bootstrap instance when it becomes hidden
+    modal.addEventListener('hidden.bs.modal', () => {
+      try {
+        const inst = bootstrap.Modal.getInstance(modal);
+        if (inst) inst.dispose();
+      } catch (e) {
+        // ignore
+      }
+      if (modal.parentNode) modal.parentNode.removeChild(modal);
+    });
+
     return modal;
   }
 
@@ -77,12 +89,8 @@ export class Modal {
   close() {
     // Prevent descendants keeping focus when modal is hidden
     try {
-      // mark inert (prevents focus) if browser supports it
-      if (this.modalElement) {
-        if (this.modalElement.setAttribute)
-          this.modalElement.setAttribute('inert', '');
-      }
-      // blur any focused element inside modal
+      if (this.modalElement && this.modalElement.setAttribute)
+        this.modalElement.setAttribute('inert', '');
       if (
         document.activeElement &&
         this.modalElement &&
@@ -91,27 +99,24 @@ export class Modal {
         document.activeElement.blur();
       }
     } catch (e) {
-      // ignore errors
-      console.warn('Could not set inert/blur during modal close', e);
+      // ignore
     }
 
-    // Wait for Bootstrap to finish hiding, then remove element
-    const onHidden = () => {
-      if (this.modalElement && this.modalElement.remove)
-        this.modalElement.remove();
+    // Hide modal via Bootstrap. The hidden handler attached in createModal
+    // will dispose the Bootstrap instance and remove the element from DOM.
+    if (this.bsModal) {
+      this.bsModal.hide();
+    } else if (this.modalElement) {
+      // If there's no bootstrap instance (e.g., dismissed via data-bs-dismiss),
+      // clean up immediately as a fallback.
+      try {
+        const inst = bootstrap.Modal.getInstance(this.modalElement);
+        if (inst) inst.dispose();
+      } catch (e) {}
+      if (this.modalElement.parentNode)
+        this.modalElement.parentNode.removeChild(this.modalElement);
       this.modalElement = null;
       this.bsModal = null;
-      this.modalElement &&
-        this.modalElement.removeEventListener &&
-        this.modalElement.removeEventListener('hidden.bs.modal', onHidden);
-    };
-
-    if (this.modalElement) {
-      this.modalElement.addEventListener('hidden.bs.modal', onHidden, {
-        once: true,
-      });
     }
-
-    if (this.bsModal) this.bsModal.hide();
   }
 }
