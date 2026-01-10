@@ -289,7 +289,18 @@ export class BooksView {
     btnClear.type = 'button';
     btnClear.className = 'btn btn-outline-secondary';
     btnClear.textContent = 'Clear';
+
     btnClear.addEventListener('click', () => {
+      // Read current values
+      const searchVal = (input.value || '').trim();
+      const authorVal = (inputAuthor.value || '').trim();
+      const genreVal = (genreSelect.value || '').trim();
+      const yearFromVal = (yearFrom.value || '').trim();
+      const yearToVal = (yearTo.value || '').trim();
+
+      if (!searchVal && !authorVal && !genreVal && !yearFromVal && !yearToVal)
+        return;
+
       input.value = '';
       inputAuthor.value = '';
       genreSelect.value = '';
