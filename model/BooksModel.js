@@ -11,9 +11,21 @@ export class BooksModel {
     this.currentFilters = {}; // { author, genre, yearFrom, yearTo }
   }
 
+  _normalizeBook(book) {
+    if (!book) return book;
+    const normalized = Object.assign({}, book);
+    if (book.details) {
+      const { author, genre, pages } = book.details;
+      if (author) normalized.author = author;
+      if (genre) normalized.genre = genre;
+      if (pages !== undefined) normalized.pages = pages;
+    }
+    return normalized;
+  }
+
   setAllBooks(allBooks) {
-    this.allBooks = allBooks || [];
-    this.filteredBooks = this.allBooks;
+    this.allBooks = (allBooks || []).map(b => this._normalizeBook(b));
+    this.filteredBooks = this.allBooks.slice();
     this.setPage(1);
   }
 
@@ -54,25 +66,22 @@ export class BooksModel {
 
     this.filteredBooks = this.allBooks.filter(book => {
       // search text matching
-      const matchesText = !text || book.title.toLowerCase().includes(text);
+      const matchesText =
+        !text || (book.title || '').toString().toLowerCase().includes(text);
 
       if (!matchesText) return false;
 
-      // author filter
-      if (
-        author &&
-        (!book.details ||
-          !book.details.author ||
-          !book.details.author.toLowerCase().includes(author.toLowerCase()))
-      )
-        return false;
+      // author filter (use top-level `author` if present)
+      if (author) {
+        const a = book.author || (book.details && book.details.author) || '';
+        if (!a.toLowerCase().includes(author.toLowerCase())) return false;
+      }
 
       // genre filter
-      if (
-        genre &&
-        (!book.details || !book.details.genre || book.details.genre !== genre)
-      )
-        return false;
+      if (genre) {
+        const g = book.genre || (book.details && book.details.genre) || '';
+        if (g !== genre) return false;
+      }
 
       // year range filter
       if (yearFrom && Number(book.year) < Number(yearFrom)) return false;
@@ -85,15 +94,15 @@ export class BooksModel {
   addBook(book) {
     if (!book) return;
 
-    const { title, year, details } = book;
-    const { author, genre, pages } = details;
+    const nb = this._normalizeBook(book);
+    const { title, year, author, genre, pages } = nb;
 
     // Перевіряємо, що обов'язкові поля заповнені
     if (!title || !year || !author || !genre || !pages) {
       alert('Some required fields are missing. Book was not added.');
       return;
     }
-    this.allBooks.push(book);
+    this.allBooks.push(nb);
     this.applyFiltersAndSearch();
   }
 
@@ -129,20 +138,28 @@ export class BooksModel {
 
   editBook(index, newBook) {
     const globalIndex = (this.currentPage - 1) * this.perPage + index;
-    this.books[index] = newBook;
-    if (this.allBooks[globalIndex]) this.allBooks[globalIndex] = newBook;
-    if (this.filteredBooks[globalIndex])
-      this.filteredBooks[globalIndex] = newBook;
+    const nb = this._normalizeBook(newBook);
+    this.books[index] = nb;
+    if (this.allBooks[globalIndex]) this.allBooks[globalIndex] = nb;
+    if (this.filteredBooks[globalIndex]) this.filteredBooks[globalIndex] = nb;
   }
 
   detailsBook(index) {
-    return this.books[index] && this.books[index].details;
+    const book = this.books[index];
+    if (!book) return undefined;
+    if (book.details) return book.details;
+    return {
+      author: book.author || '',
+      genre: book.genre || '',
+      pages: book.pages || '',
+    };
   }
 
   getGenres() {
     const set = new Set();
     this.allBooks.forEach(b => {
-      if (b.details && b.details.genre) set.add(b.details.genre);
+      if (b.genre) set.add(b.genre);
+      else if (b.details && b.details.genre) set.add(b.details.genre);
     });
     return Array.from(set).sort();
   }
@@ -178,10 +195,10 @@ export class BooksModel {
     arr.forEach(b => {
       const r = [
         escape(b.title),
-        escape(b.details && b.details.author),
+        escape(b.author || (b.details && b.details.author)),
         escape(b.year),
-        escape(b.details && b.details.genre),
-        escape(b.details && b.details.pages),
+        escape(b.genre || (b.details && b.details.genre)),
+        escape(b.pages || (b.details && b.details.pages)),
       ];
       rows.push(r.join(','));
     });

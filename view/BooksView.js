@@ -17,11 +17,15 @@ export class BooksView {
   }
 
   render(books, currentPage, perPage) {
-    this.container.innerHTML = `<td colspan="3" style="height:100px; vertical-align:middle;" class="text-center">
-  <div class="spinner-border text-primary" role="status">
-    <span class="visually-hidden">Loading...</span>
-  </div>
-</td>`;
+    this.container.innerHTML = `
+  <tr>
+    <td colspan="7" class="text-center align-middle py-4">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </td>
+  </tr>
+`;
     setTimeout(() => {
       this.container.innerHTML = '';
 
@@ -29,17 +33,43 @@ export class BooksView {
         const tr = document.createElement('tr');
 
         const th = document.createElement('th');
-        th.style.width = '50px';
         th.scope = 'row';
+        th.style.Width = '200px';
+        th.className = 'align-middle';
         th.textContent = index + 1 + (currentPage - 1) * perPage;
 
         const tdTitle = document.createElement('td');
-        tdTitle.textContent = book.title;
-        tdTitle.style.cursor = 'pointer';
-        tdTitle.style.maxWidth = '500px';
-        tdTitle.style.whiteSpace = 'nowrap';
-        tdTitle.style.overflow = 'hidden';
-        tdTitle.style.textOverflow = 'ellipsis';
+        const titleWrap = document.createElement('div');
+        titleWrap.className = 'text-truncate d-inline-block w-80';
+        titleWrap.textContent = book.title;
+        tdTitle.appendChild(titleWrap);
+
+        const tdAuthor = document.createElement('td');
+        const authorWrap = document.createElement('div');
+        authorWrap.className = 'text-truncate d-inline-block w-100';
+        authorWrap.textContent =
+          book.author || (book.details && book.details.author) || '';
+        tdAuthor.appendChild(authorWrap);
+
+        const tdYear = document.createElement('td');
+        tdYear.className = 'col-1';
+        tdYear.textContent = book.year || '';
+
+        const tdGenre = document.createElement('td');
+        const genreWrap = document.createElement('div');
+        genreWrap.className = 'text-truncate d-inline-block w-100';
+        genreWrap.textContent =
+          book.genre || (book.details && book.details.genre) || '';
+        tdGenre.appendChild(genreWrap);
+
+        const tdPages = document.createElement('td');
+        tdPages.className = 'col-1 text-center';
+        tdPages.textContent =
+          book.pages !== undefined
+            ? String(book.pages)
+            : book.details && book.details.pages
+            ? String(book.details.pages)
+            : '';
 
         const tdAButtons = document.createElement('td');
 
@@ -68,6 +98,10 @@ export class BooksView {
 
         tr.appendChild(th);
         tr.appendChild(tdTitle);
+        tr.appendChild(tdAuthor);
+        tr.appendChild(tdYear);
+        tr.appendChild(tdGenre);
+        tr.appendChild(tdPages);
         tr.appendChild(tdAButtons);
 
         this.container.appendChild(tr);
