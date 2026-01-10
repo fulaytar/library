@@ -59,6 +59,14 @@ export class Modal {
   }
 
   open() {
+    // ensure modal is focusable and not inert when opened
+    if (
+      this.modalElement.hasAttribute &&
+      this.modalElement.hasAttribute('inert')
+    ) {
+      this.modalElement.removeAttribute('inert');
+    }
+
     this.bsModal = new bootstrap.Modal(this.modalElement);
     this.bsModal.show();
 
@@ -67,9 +75,43 @@ export class Modal {
   }
 
   close() {
-    this.bsModal.hide();
-    this.modalElement.remove();
-    this.modalElement = null;
-    this.bsModal = null;
+    // Prevent descendants keeping focus when modal is hidden
+    try {
+      // mark inert (prevents focus) if browser supports it
+      if (this.modalElement) {
+        if (this.modalElement.setAttribute)
+          this.modalElement.setAttribute('inert', '');
+      }
+      // blur any focused element inside modal
+      if (
+        document.activeElement &&
+        this.modalElement &&
+        this.modalElement.contains(document.activeElement)
+      ) {
+        document.activeElement.blur();
+      }
+    } catch (e) {
+      // ignore errors
+      console.warn('Could not set inert/blur during modal close', e);
+    }
+
+    // Wait for Bootstrap to finish hiding, then remove element
+    const onHidden = () => {
+      if (this.modalElement && this.modalElement.remove)
+        this.modalElement.remove();
+      this.modalElement = null;
+      this.bsModal = null;
+      this.modalElement &&
+        this.modalElement.removeEventListener &&
+        this.modalElement.removeEventListener('hidden.bs.modal', onHidden);
+    };
+
+    if (this.modalElement) {
+      this.modalElement.addEventListener('hidden.bs.modal', onHidden, {
+        once: true,
+      });
+    }
+
+    if (this.bsModal) this.bsModal.hide();
   }
 }
