@@ -219,17 +219,12 @@ export class BooksView {
     defaultOpt.value = '';
     defaultOpt.textContent = 'Any genre';
     genreSelect.appendChild(defaultOpt);
+    // accessibility attribute (English label as requested)
+    genreSelect.setAttribute('aria-label', 'Genre');
     genreSelect.addEventListener('change', () => {
       this._triggerFilter();
     });
 
-    // accessible label for the select (visually hidden but available to screen readers)
-    const genreLabel = document.createElement('label');
-    genreLabel.htmlFor = 'filter-genre';
-    genreLabel.className = 'form-label visually-hidden';
-    genreLabel.textContent = 'Genre';
-
-    divGenre.appendChild(genreLabel);
     divGenre.appendChild(genreSelect);
 
     // Year range
