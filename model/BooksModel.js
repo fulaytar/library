@@ -142,13 +142,15 @@ export class BooksModel {
   }
 
   exportData(format = 'csv', scope = 'all') {
+    const checkNameExport =
+      scope === 'all' ? 'all' : `_page-${this.currentPage}`;
     const arr =
       scope === 'page' ? this.books.slice() : this.filteredBooks.slice();
 
     if (format === 'json') {
       return {
         data: JSON.stringify(arr, null, 2),
-        fileName: `books_export_${scope}.json`,
+        fileName: `books_export_${checkNameExport}.json`,
         mimeType: 'application/json',
       };
     }
@@ -180,7 +182,7 @@ export class BooksModel {
 
     return {
       data: rows.join('\n'),
-      fileName: `books_export_${scope}.csv`,
+      fileName: `books_export_${checkNameExport}.csv`,
       mimeType: 'text/csv;charset=utf-8;',
     };
   }
