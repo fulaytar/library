@@ -10,7 +10,10 @@ export class BooksController {
     this.view = view;
     this.model.setAllBooks(books);
 
-    this.view.renderFilters(this.model.getGenres());
+    this.view.renderFilters(
+      this.model.getGenres(),
+      this.model.currentFilters.genre || ''
+    );
 
     this.view.onSearch = query => {
       this.model.searchBooks(query);
@@ -100,7 +103,10 @@ export class BooksController {
       (this.view.onPageChange = page => this.changePage(page))
     );
 
-    this.view.renderFilters(this.model.getGenres());
+    this.view.renderFilters(
+      this.model.getGenres(),
+      this.model.currentFilters.genre || ''
+    );
   }
   actionsBtn(index, newBook) {
     this.onDetails = this.model.detailsBook(index);

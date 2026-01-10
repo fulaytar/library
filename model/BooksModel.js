@@ -110,6 +110,12 @@ export class BooksModel {
           (b.title === removedBook.title && b.year === removedBook.year)
       );
       if (ai !== -1) this.allBooks.splice(ai, 1);
+      if (this.filteredBooks.length === 0) {
+        this.searchQuery = '';
+        this.currentFilters = {};
+        this.applyFiltersAndSearch();
+        this.setPage(1);
+      }
     }
 
     const start = (this.currentPage - 1) * this.perPage;

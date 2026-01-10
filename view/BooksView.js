@@ -214,8 +214,15 @@ export class BooksView {
     const genreSelect = document.createElement('select');
     genreSelect.id = 'filter-genre';
     genreSelect.className = 'form-select';
-    genreSelect.innerHTML = '<option value="">Any genre</option>';
-    genreSelect.addEventListener('change', () => this._triggerFilter());
+    // create default option instead of using innerHTML
+    const defaultOpt = document.createElement('option');
+    defaultOpt.value = '';
+    defaultOpt.textContent = 'Any genre';
+    genreSelect.appendChild(defaultOpt);
+    genreSelect.addEventListener('change', () => {
+      this._triggerFilter();
+    });
+
     divGenre.appendChild(genreSelect);
 
     // Year range
@@ -350,7 +357,7 @@ export class BooksView {
     prependTable.insertAdjacentElement('afterend', container);
   }
 
-  renderFilters(genres = []) {
+  renderFilters(genres = [], selectedGenre = '') {
     // We now have combined search+filters block; just populate the genre select
     // If the combined block does not exist yet, create it
     const block = document.getElementById('search-filters-block');
@@ -375,6 +382,16 @@ export class BooksView {
       opt.textContent = g;
       genreSelect.appendChild(opt);
     });
+
+    // restore previously selected genre if provided and still present
+    if (
+      selectedGenre &&
+      Array.from(genreSelect.options).some(o => o.value === selectedGenre)
+    ) {
+      genreSelect.value = selectedGenre;
+    } else {
+      genreSelect.value = '';
+    }
   }
 
   _triggerFilter() {
@@ -395,8 +412,8 @@ export class BooksView {
     }
   }
 
-  renderFiltersWithGenres(genres) {
-    this.renderFilters(genres);
+  renderFiltersWithGenres(genres, selectedGenre = '') {
+    this.renderFilters(genres, selectedGenre);
   }
 }
 //тільки DOM
