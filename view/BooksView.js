@@ -227,7 +227,24 @@ export class BooksView {
     yearFrom.className = 'form-control';
     yearFrom.placeholder = 'From';
     yearFrom.min = '0';
-    yearFrom.addEventListener('input', () => this._triggerFilter());
+    yearFrom.step = '1';
+    yearFrom.inputMode = 'numeric';
+    // block +, -, e/E on keydown
+    yearFrom.addEventListener('keydown', e => {
+      if (e.key === 'e' || e.key === 'E' || e.key === '+' || e.key === '-')
+        e.preventDefault();
+    });
+    // sanitize pasted content (allow only digits)
+    yearFrom.addEventListener('paste', e => {
+      const text = (e.clipboardData || window.clipboardData).getData('text');
+      if (!/^\d*$/.test(text)) e.preventDefault();
+    });
+    // sanitize on input (keeps only digits)
+    yearFrom.addEventListener('input', () => {
+      if (yearFrom.value !== '')
+        yearFrom.value = yearFrom.value.replace(/[^\d]/g, '');
+      this._triggerFilter();
+    });
     divYearFrom.appendChild(yearFrom);
 
     const divYearTo = document.createElement('div');
@@ -238,7 +255,21 @@ export class BooksView {
     yearTo.className = 'form-control';
     yearTo.placeholder = 'To';
     yearTo.min = '0';
-    yearTo.addEventListener('input', () => this._triggerFilter());
+    yearTo.step = '1';
+    yearTo.inputMode = 'numeric';
+    yearTo.addEventListener('keydown', e => {
+      if (e.key === 'e' || e.key === 'E' || e.key === '+' || e.key === '-')
+        e.preventDefault();
+    });
+    yearTo.addEventListener('paste', e => {
+      const text = (e.clipboardData || window.clipboardData).getData('text');
+      if (!/^\d*$/.test(text)) e.preventDefault();
+    });
+    yearTo.addEventListener('input', () => {
+      if (yearTo.value !== '')
+        yearTo.value = yearTo.value.replace(/[^\d]/g, '');
+      this._triggerFilter();
+    });
     divYearTo.appendChild(yearTo);
 
     // Clear + export
@@ -358,8 +389,8 @@ export class BooksView {
       this.onFilter({
         author: author.trim(),
         genre,
-        yearFrom: yearFrom ? Number(yearFrom) : '',
-        yearTo: yearTo ? Number(yearTo) : '',
+        yearFrom: yearFrom !== '' ? Number(yearFrom) : '',
+        yearTo: yearTo !== '' ? Number(yearTo) : '',
       });
     }
   }
