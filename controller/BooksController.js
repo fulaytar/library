@@ -9,10 +9,40 @@ export class BooksController {
     this.model = model;
     this.view = view;
     this.model.setAllBooks(books);
+
+    this.view.renderFilters(this.model.getGenres());
+
     this.view.onSearch = query => {
       this.model.searchBooks(query);
       this.updateView();
     };
+
+    this.view.onFilter = filters => {
+      this.model.filterBooks(filters);
+      this.updateView();
+    };
+
+    this.view.onExport = options => {
+      try {
+        const { data, fileName, mimeType } = this.model.exportData(
+          options.format,
+          options.scope
+        );
+        const blob = new Blob([data], { type: mimeType });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+      } catch (err) {
+        console.error('Export failed', err);
+        alert('Failed to export data');
+      }
+    };
+
     this.view.onDetails = index => {
       const book = this.model.getBooks()[index];
       new DetailsModal(book).open();
@@ -46,43 +76,12 @@ export class BooksController {
       }).open();
     };
 
-    this.view.onExport = index => {
-      const book = this.model.getBooks()[index];
-
-      const text = `
-Title: ${book.title}
-Author: ${book.details.author}
-Year: ${book.year}
-Genre: ${book.details.genre || '-'}
-Pages: ${book.details.pages || '-'}
-  `.trim();
-
-      navigator.clipboard
-        .writeText(text)
-        .then(() => alert(`Book "${book.title}" copied to clipboard!`))
-        .catch(err => console.error('Failed to copy book: ', err));
-    };
-
     this.updateView();
   }
 
   changePage(page) {
     this.model.setPage(page);
     this.updateView();
-  }
-
-  exportBook(index) {
-    const book = this.model.getBooks()[index];
-    const json = JSON.stringify(book, null, 2);
-    navigator.clipboard
-      .writeText(json)
-      .then(() => {
-        alert(`Book "${book.title}" copied to clipboard!`);
-      })
-      .catch(err => {
-        console.error('Failed to copy book: ', err);
-        alert('Failed to copy book!');
-      });
   }
 
   updateView() {
@@ -100,6 +99,8 @@ Pages: ${book.details.pages || '-'}
       this.model.currentPage,
       (this.view.onPageChange = page => this.changePage(page))
     );
+
+    this.view.renderFilters(this.model.getGenres());
   }
   actionsBtn(index, newBook) {
     this.onDetails = this.model.detailsBook(index);

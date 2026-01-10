@@ -1,17 +1,21 @@
 export class BooksView {
   constructor(container) {
     this.container = container;
-    this.renderSearch();
-
     this.onPageChange = null;
     this.onSearch = null;
+
+    this.onFilter = null;
+    this.onExport = null;
 
     this.onDetails = null;
     this.onEdit = null;
     this.onDelete = null;
-    this.onExport = null;
     this.onAdd = null;
+
+    this.renderSearch();
+    this.renderFilters([]);
   }
+
   render(books, currentPage, perPage) {
     this.container.innerHTML = `<td colspan="3" style="height:100px; vertical-align:middle;" class="text-center">
   <div class="spinner-border text-primary" role="status">
@@ -25,6 +29,7 @@ export class BooksView {
         const tr = document.createElement('tr');
 
         const th = document.createElement('th');
+        th.style.width = '50px';
         th.scope = 'row';
         th.textContent = index + 1 + (currentPage - 1) * perPage;
 
@@ -59,30 +64,7 @@ export class BooksView {
           if (this.onDelete) this.onDelete(index);
         });
 
-        const btnExport = document.createElement('button');
-        btnExport.textContent = 'Export';
-        btnExport.className = 'btn btn-sm btn-outline-success me-1';
-        btnExport.addEventListener('click', () => this.onExport(index));
-
-        const btnAddBook = document.createElement('button');
-        btnAddBook.textContent = 'Add book?';
-        btnAddBook.style.position = 'fixed';
-        btnAddBook.style.bottom = '30px';
-        btnAddBook.style.right = '30px';
-        btnAddBook.style.padding = '10px 20px';
-        btnAddBook.style.backgroundColor = '#6f42c1';
-        btnAddBook.style.color = 'white';
-        btnAddBook.style.border = 'none';
-        btnAddBook.style.borderRadius = '5px';
-        btnAddBook.style.cursor = 'pointer';
-        btnAddBook.style.boxShadow = '0 4px 4px rgba(0,0,0,0.2)';
-        btnAddBook.style.zIndex = '1000';
-        btnAddBook.style.fontSize = '16px';
-        btnAddBook.addEventListener('click', () => this.onAdd());
-
-        document.body.appendChild(btnAddBook);
-
-        tdAButtons.append(btnDetails, btnEdit, btnDelete, btnExport);
+        tdAButtons.append(btnDetails, btnEdit, btnDelete);
 
         tr.appendChild(th);
         tr.appendChild(tdTitle);
@@ -92,6 +74,7 @@ export class BooksView {
       });
     }, 500);
   }
+
   renderPagination(totalPages, currentPage, onPageChange) {
     let paginationContainer = document.getElementById('pagination');
     if (!paginationContainer) {
@@ -184,37 +167,205 @@ export class BooksView {
       paginationContainer.appendChild(nextElement);
     }
   }
+
   renderSearch() {
+    // If form already exists, do not recreate; keep inputs and wiring
+    let container = document.getElementById('search-filters-block');
+    if (container) return;
+
+    container = document.createElement('div');
+    container.id = 'search-filters-block';
+    container.className = 'mt-4';
+
+    // Use Bootstrap responsive row for a single, nice block
     const form = document.createElement('form');
-    form.className = 'mb-3 mx-auto';
-    form.style.maxWidth = '400px';
+    form.className = 'row g-2 align-items-center';
     form.setAttribute('role', 'search');
     form.addEventListener('submit', e => e.preventDefault());
 
-    const label = document.createElement('label');
-    label.className = 'visually-hidden';
-    label.setAttribute('for', 'input-search');
-    label.textContent = 'Search';
-
+    // Search input (main, larger)
+    const divSearch = document.createElement('div');
+    divSearch.className = 'col-12 col-sm-6 col-md-2';
     const input = document.createElement('input');
     input.type = 'search';
     input.id = 'input-search';
-    input.className = 'form-control shadow-sm';
-    input.placeholder = 'Search books by title, author, or year';
-    input.style.width = '100%';
+    input.className = 'form-control ';
+    input.placeholder = 'Search by title';
     input.style.borderRadius = '8px';
-    input.style.padding = '8px 12px';
-
     input.addEventListener('input', e => {
-      if (this.onSearch) {
-        this.onSearch(e.target.value);
-      }
+      if (this.onSearch) this.onSearch(e.target.value);
+    });
+    divSearch.appendChild(input);
+
+    // Author filter
+    const divAuthor = document.createElement('div');
+    divAuthor.className = 'col-12 col-sm-6 col-md-2';
+    const inputAuthor = document.createElement('input');
+    inputAuthor.type = 'text';
+    inputAuthor.id = 'filter-author';
+    inputAuthor.className = 'form-control';
+    inputAuthor.placeholder = 'Author';
+    inputAuthor.addEventListener('input', () => this._triggerFilter());
+    divAuthor.appendChild(inputAuthor);
+
+    // Genre filter
+    const divGenre = document.createElement('div');
+    divGenre.className = 'col-12 col-sm-6 col-md-2';
+    const genreSelect = document.createElement('select');
+    genreSelect.id = 'filter-genre';
+    genreSelect.className = 'form-select';
+    genreSelect.innerHTML = '<option value="">Any genre</option>';
+    genreSelect.addEventListener('change', () => this._triggerFilter());
+    divGenre.appendChild(genreSelect);
+
+    // Year range
+    const divYearFrom = document.createElement('div');
+    divYearFrom.className = 'col-6 col-md-1';
+    const yearFrom = document.createElement('input');
+    yearFrom.type = 'number';
+    yearFrom.id = 'filter-year-from';
+    yearFrom.className = 'form-control';
+    yearFrom.placeholder = 'From';
+    yearFrom.min = '0';
+    yearFrom.addEventListener('input', () => this._triggerFilter());
+    divYearFrom.appendChild(yearFrom);
+
+    const divYearTo = document.createElement('div');
+    divYearTo.className = 'col-6 col-md-1';
+    const yearTo = document.createElement('input');
+    yearTo.type = 'number';
+    yearTo.id = 'filter-year-to';
+    yearTo.className = 'form-control';
+    yearTo.placeholder = 'To';
+    yearTo.min = '0';
+    yearTo.addEventListener('input', () => this._triggerFilter());
+    divYearTo.appendChild(yearTo);
+
+    // Clear + export
+    const divActions = document.createElement('div');
+    divActions.className = 'col-12 col-md-auto d-flex gap-2';
+
+    const btnClear = document.createElement('button');
+    btnClear.type = 'button';
+    btnClear.className = 'btn btn-outline-secondary';
+    btnClear.textContent = 'Clear';
+    btnClear.addEventListener('click', () => {
+      input.value = '';
+      inputAuthor.value = '';
+      genreSelect.value = '';
+      yearFrom.value = '';
+      yearTo.value = '';
+      if (this.onSearch) this.onSearch('');
+      if (this.onFilter)
+        this.onFilter({ author: '', genre: '', yearFrom: '', yearTo: '' });
     });
 
-    form.append(label, input);
+    // Export dropdown
+    const exportWrapper = document.createElement('div');
+    exportWrapper.className = 'btn-group';
+
+    const exportBtn = document.createElement('button');
+    exportBtn.className = 'btn btn-outline-primary dropdown-toggle';
+    exportBtn.setAttribute('data-bs-toggle', 'dropdown');
+    exportBtn.textContent = 'Export';
+
+    const exportMenu = document.createElement('ul');
+    exportMenu.className = 'dropdown-menu';
+
+    const makeExportItem = (label, format, scope) => {
+      const li = document.createElement('li');
+      const a = document.createElement('a');
+      a.className = 'dropdown-item';
+      a.href = '#';
+      a.textContent = label;
+      a.addEventListener('click', e => {
+        e.preventDefault();
+        if (this.onExport) this.onExport({ format, scope });
+      });
+      li.appendChild(a);
+      exportMenu.appendChild(li);
+    };
+
+    makeExportItem('CSV (all)', 'csv', 'all');
+    makeExportItem('CSV (current page)', 'csv', 'page');
+    makeExportItem('JSON (all)', 'json', 'all');
+    makeExportItem('JSON (current page)', 'json', 'page');
+
+    exportWrapper.append(exportBtn, exportMenu);
+
+    // Add button (visible, inline with filters)
+    const btnAdd = document.createElement('button');
+    btnAdd.type = 'button';
+    btnAdd.className = 'btn btn-success';
+    btnAdd.textContent = 'Add book';
+    btnAdd.addEventListener('click', () => this.onAdd && this.onAdd());
+
+    divActions.appendChild(btnAdd);
+    divActions.appendChild(btnClear);
+    divActions.appendChild(exportWrapper);
+
+    form.append(
+      divSearch,
+      divAuthor,
+      divGenre,
+      divYearFrom,
+      divYearTo,
+      divActions
+    );
+
+    container.appendChild(form);
 
     const prependTable = document.querySelector('#title');
-    prependTable.insertAdjacentElement('afterend', form);
+    prependTable.insertAdjacentElement('afterend', container);
+  }
+
+  renderFilters(genres = []) {
+    // We now have combined search+filters block; just populate the genre select
+    // If the combined block does not exist yet, create it
+    const block = document.getElementById('search-filters-block');
+    if (!block) {
+      // create the combined block and then re-call to populate genres
+      this.renderSearch();
+    }
+
+    const genreSelect = document.querySelector('#filter-genre');
+    if (!genreSelect) return;
+
+    // clear existing options and add default
+    genreSelect.innerHTML = '';
+    const any = document.createElement('option');
+    any.value = '';
+    any.textContent = 'Any genre';
+    genreSelect.appendChild(any);
+
+    genres.forEach(g => {
+      const opt = document.createElement('option');
+      opt.value = g;
+      opt.textContent = g;
+      genreSelect.appendChild(opt);
+    });
+  }
+
+  _triggerFilter() {
+    const author = (document.getElementById('filter-author') || {}).value || '';
+    const genre = (document.getElementById('filter-genre') || {}).value || '';
+    const yearFrom =
+      (document.getElementById('filter-year-from') || {}).value || '';
+    const yearTo =
+      (document.getElementById('filter-year-to') || {}).value || '';
+
+    if (this.onFilter) {
+      this.onFilter({
+        author: author.trim(),
+        genre,
+        yearFrom: yearFrom ? Number(yearFrom) : '',
+        yearTo: yearTo ? Number(yearTo) : '',
+      });
+    }
+  }
+
+  renderFiltersWithGenres(genres) {
+    this.renderFilters(genres);
   }
 }
 //тільки DOM
