@@ -223,6 +223,13 @@ export class BooksView {
       this._triggerFilter();
     });
 
+    // accessible label for the select (visually hidden but available to screen readers)
+    const genreLabel = document.createElement('label');
+    genreLabel.htmlFor = 'filter-genre';
+    genreLabel.className = 'form-label visually-hidden';
+    genreLabel.textContent = 'Genre';
+
+    divGenre.appendChild(genreLabel);
     divGenre.appendChild(genreSelect);
 
     // Year range
