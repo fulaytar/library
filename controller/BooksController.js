@@ -1,4 +1,5 @@
 import books from '../books.js';
+import { FakeBooksApi } from '../fakeApi.js';
 import { DetailsModal } from '../view/DetailsModal.js';
 import { FormModal } from '../view/FormModal.js';
 import { DeleteModal } from '../view/DeleteModal.js';
@@ -9,14 +10,11 @@ export class BooksController {
     this.model = model;
     this.view = view;
     this.storageKey = 'library_books';
-
-    const storedBooks = this.loadStoredBooks();
-    this.model.setAllBooks(storedBooks || books);
-
-    this.view.renderFilters(
-      this.model.getGenres(),
-      this.model.currentFilters.genre || ''
-    );
+    this.api = new FakeBooksApi({
+      seedBooks: books,
+      storageKey: this.storageKey,
+      delay: 300,
+    });
 
     this.view.onSearch = query => {
       this.model.searchBooks(query);
@@ -49,23 +47,41 @@ export class BooksController {
       }
     };
 
-    this.view.onDetails = index => {
+    this.view.onDetails = async index => {
       const book = this.model.getBooks()[index];
-      new DetailsModal(book).open();
+      if (!book) return;
+      const modal = new DetailsModal();
+      modal.open();
+      try {
+        const fullBook = await this.api.details(book);
+        modal.setBook(fullBook || book);
+      } catch (err) {
+        console.error('Failed to load details', err);
+        modal.setError('Failed to load details');
+      }
     };
 
     this.view.onEdit = index => {
       const book = this.model.getBooks()[index];
+      if (!book) return;
       new FormModal({
         book,
         genres: this.model.getGenres(),
-        onConfirm: updatedBook => {
+        onConfirm: async updatedBook => {
           const editor = this.view.getUserName
             ? this.view.getUserName()
             : 'unknown';
-          this.model.editBook(index, updatedBook, editor);
-          this.saveBooks();
-          this.updateView();
+          try {
+            if (this.view.showLoading) this.view.showLoading();
+            await this.api.update(book, updatedBook);
+            this.model.editBook(index, updatedBook, editor);
+            this.updateView();
+          } catch (err) {
+            console.error('Failed to update book', err);
+            alert('Failed to update book');
+          } finally {
+            if (this.view.hideLoading) this.view.hideLoading();
+          }
         },
       }).open();
     };
@@ -73,49 +89,63 @@ export class BooksController {
     this.view.onAdd = () => {
       new AddModal({
         genres: this.model.getGenres(),
-        onConfirm: newBook => {
+        onConfirm: async newBook => {
           const creator = this.view.getUserName
             ? this.view.getUserName()
             : 'unknown';
-          this.model.addBook(newBook, creator);
-          this.saveBooks();
-          this.updateView();
+          try {
+            if (this.view.showLoading) this.view.showLoading();
+            const created = await this.api.create(newBook);
+            this.model.addBook(created || newBook, creator);
+            this.updateView();
+          } catch (err) {
+            console.error('Failed to create book', err);
+            alert('Failed to create book');
+          } finally {
+            if (this.view.hideLoading) this.view.hideLoading();
+          }
         },
       }).open();
     };
 
     this.view.onDelete = index => {
       const book = this.model.getBooks()[index];
-      new DeleteModal(book, () => {
-        this.model.deleteBook(index);
-        this.saveBooks();
-        this.updateView();
+      if (!book) return;
+      new DeleteModal(book, async () => {
+        try {
+          if (this.view.showLoading) this.view.showLoading();
+          await this.api.remove(book);
+          this.model.deleteBook(index);
+          this.updateView();
+        } catch (err) {
+          console.error('Failed to delete book', err);
+          alert('Failed to delete book');
+        } finally {
+          if (this.view.hideLoading) this.view.hideLoading();
+        }
       }).open();
     };
 
-    this.updateView();
+    this.init();
   }
 
-  loadStoredBooks() {
+  async init() {
     try {
-      const raw = localStorage.getItem(this.storageKey);
-      if (!raw) return null;
-      const parsed = JSON.parse(raw);
-      return Array.isArray(parsed) ? parsed : null;
-    } catch (err) {
-      console.error('Failed to load stored books', err);
-      return null;
-    }
-  }
+      if (this.view.showLoading) this.view.showLoading();
+      const storedBooks = await this.api.list();
+      this.model.setAllBooks(storedBooks || []);
 
-  saveBooks() {
-    try {
-      localStorage.setItem(
-        this.storageKey,
-        JSON.stringify(this.model.allBooks)
+      this.view.renderFilters(
+        this.model.getGenres(),
+        this.model.currentFilters.genre || ''
       );
+
+      this.updateView();
     } catch (err) {
-      console.error('Failed to save books', err);
+      console.error('Failed to load books', err);
+      alert('Failed to load books');
+    } finally {
+      if (this.view.hideLoading) this.view.hideLoading();
     }
   }
 

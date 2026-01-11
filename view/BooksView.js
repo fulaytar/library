@@ -19,104 +19,120 @@ export class BooksView {
   }
 
   render(books, currentPage, perPage) {
-    this.#container.innerHTML = `
-  <tr>
-    <td colspan="7" class="text-center align-middle py-4">
-      <div class="spinner-border text-primary" role="status">
-        <span class="visually-hidden">Loading...</span>
-      </div>
-    </td>
-  </tr>
-`;
-    setTimeout(() => {
-      this.#container.innerHTML = '';
+    this.#container.innerHTML = '';
+    this.#container.dataset.loading = 'false';
 
-      books.forEach((book, index) => {
-        const tr = document.createElement('tr');
+    books.forEach((book, index) => {
+      const tr = document.createElement('tr');
 
-        const th = document.createElement('th');
-        th.scope = 'row';
-        th.style.Width = '200px';
-        th.className = 'align-middle';
-        th.textContent = index + 1 + (currentPage - 1) * perPage;
+      const th = document.createElement('th');
+      th.scope = 'row';
+      th.style.Width = '200px';
+      th.className = 'align-middle';
+      th.textContent = index + 1 + (currentPage - 1) * perPage;
 
-        const tdTitle = document.createElement('td');
-        const titleWrap = document.createElement('div');
-        titleWrap.className = 'text-truncate d-inline-block w-80';
-        titleWrap.textContent = book.title;
-        tdTitle.appendChild(titleWrap);
+      const tdTitle = document.createElement('td');
+      const titleWrap = document.createElement('div');
+      titleWrap.className = 'text-truncate d-inline-block w-80';
+      titleWrap.textContent = book.title;
+      tdTitle.appendChild(titleWrap);
 
-        const tdAuthor = document.createElement('td');
-        tdAuthor.className = 'w-25';
-        const authorWrap = document.createElement('div');
-        authorWrap.className = 'text-truncate d-inline-block w-100';
-        authorWrap.textContent =
-          book.author || (book.details && book.details.author) || '';
-        tdAuthor.appendChild(authorWrap);
+      const tdAuthor = document.createElement('td');
+      tdAuthor.className = 'w-25';
+      const authorWrap = document.createElement('div');
+      authorWrap.className = 'text-truncate d-inline-block w-100';
+      authorWrap.textContent =
+        book.author || (book.details && book.details.author) || '';
+      tdAuthor.appendChild(authorWrap);
 
-        const tdYear = document.createElement('td');
-        tdYear.className = 'col-1';
-        tdYear.textContent = book.year || '';
+      const tdYear = document.createElement('td');
+      tdYear.className = 'col-1';
+      tdYear.textContent = book.year || '';
 
-        const tdGenre = document.createElement('td');
-        const genreWrap = document.createElement('div');
-        genreWrap.className = 'text-truncate d-inline-block w-100';
-        genreWrap.textContent =
-          book.genre || (book.details && book.details.genre) || '';
-        tdGenre.appendChild(genreWrap);
+      const tdGenre = document.createElement('td');
+      const genreWrap = document.createElement('div');
+      genreWrap.className = 'text-truncate d-inline-block w-100';
+      genreWrap.textContent =
+        book.genre || (book.details && book.details.genre) || '';
+      tdGenre.appendChild(genreWrap);
 
-        const tdPages = document.createElement('td');
-        tdPages.className = 'col-1 text-center';
-        tdPages.textContent =
-          book.pages !== undefined
-            ? String(book.pages)
-            : book.details && book.details.pages
-            ? String(book.details.pages)
-            : '';
+      const tdPages = document.createElement('td');
+      tdPages.className = 'col-1 text-center';
+      tdPages.textContent =
+        book.pages !== undefined
+          ? String(book.pages)
+          : book.details && book.details.pages
+          ? String(book.details.pages)
+          : '';
 
-        const tdAButtons = document.createElement('td');
+      const tdAButtons = document.createElement('td');
 
-        const btnDetails = document.createElement('button');
-        btnDetails.className = 'btn btn-sm btn-info me-1';
-        btnDetails.setAttribute('title', 'Details');
-        btnDetails.setAttribute('aria-label', 'View details');
-        btnDetails.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>`;
-        btnDetails.addEventListener('click', () => {
-          if (this.onDetails) this.onDetails(index);
-        });
-
-        const btnEdit = document.createElement('button');
-        btnEdit.className = 'btn btn-sm btn-warning me-1';
-        btnEdit.setAttribute('title', 'Edit');
-        btnEdit.setAttribute('aria-label', 'Edit book');
-        // quill / feather icon (inline SVG, using currentColor)
-        btnEdit.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 21l1.5-4.5L17.5 3.5l3 3L7.5 20.5 3 21zM20.7 7.3l-4-4 1.4-1.4 4 4-1.4 1.4z"/></svg>`;
-        btnEdit.addEventListener('click', () => {
-          if (this.onEdit) this.onEdit(index);
-        });
-
-        const btnDelete = document.createElement('button');
-        btnDelete.className = 'btn btn-sm btn-danger me-1';
-        btnDelete.setAttribute('title', 'Delete');
-        btnDelete.setAttribute('aria-label', 'Delete book');
-        btnDelete.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6 7h12v13a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V7zm3-4h6l1 1H8l1-1zM9 9v9h2V9H9zm4 0v9h2V9h-2z"/></svg>`;
-        btnDelete.addEventListener('click', () => {
-          if (this.onDelete) this.onDelete(index);
-        });
-
-        tdAButtons.append(btnDetails, btnEdit, btnDelete);
-
-        tr.appendChild(th);
-        tr.appendChild(tdTitle);
-        tr.appendChild(tdAuthor);
-        tr.appendChild(tdYear);
-        tr.appendChild(tdGenre);
-        tr.appendChild(tdPages);
-        tr.appendChild(tdAButtons);
-
-        this.#container.appendChild(tr);
+      const btnDetails = document.createElement('button');
+      btnDetails.className = 'btn btn-sm btn-info me-1';
+      btnDetails.setAttribute('title', 'Details');
+      btnDetails.setAttribute('aria-label', 'View details');
+      btnDetails.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>`;
+      btnDetails.addEventListener('click', () => {
+        if (this.#userName === undefined || this.#userName === '')
+          return alert('Please enter your name');
+        if (this.onDetails) this.onDetails(index);
       });
-    }, 500);
+
+      const btnEdit = document.createElement('button');
+      btnEdit.className = 'btn btn-sm btn-warning me-1';
+      btnEdit.setAttribute('title', 'Edit');
+      btnEdit.setAttribute('aria-label', 'Edit book');
+      // quill / feather icon (inline SVG, using currentColor)
+      btnEdit.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 21l1.5-4.5L17.5 3.5l3 3L7.5 20.5 3 21zM20.7 7.3l-4-4 1.4-1.4 4 4-1.4 1.4z"/></svg>`;
+      btnEdit.addEventListener('click', () => {
+        if (this.#userName === undefined || this.#userName === '')
+          return alert('Please enter your name');
+        if (this.onEdit) this.onEdit(index);
+      });
+
+      const btnDelete = document.createElement('button');
+      btnDelete.className = 'btn btn-sm btn-danger me-1';
+      btnDelete.setAttribute('title', 'Delete');
+      btnDelete.setAttribute('aria-label', 'Delete book');
+      btnDelete.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6 7h12v13a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V7zm3-4h6l1 1H8l1-1zM9 9v9h2V9H9zm4 0v9h2V9h-2z"/></svg>`;
+      btnDelete.addEventListener('click', () => {
+        if (this.#userName === undefined || this.#userName === '')
+          return alert('Please enter your name');
+        if (this.onDelete) this.onDelete(index);
+      });
+
+      tdAButtons.append(btnDetails, btnEdit, btnDelete);
+
+      tr.appendChild(th);
+      tr.appendChild(tdTitle);
+      tr.appendChild(tdAuthor);
+      tr.appendChild(tdYear);
+      tr.appendChild(tdGenre);
+      tr.appendChild(tdPages);
+      tr.appendChild(tdAButtons);
+
+      this.#container.appendChild(tr);
+    });
+  }
+
+  showLoading() {
+    this.#container.dataset.loading = 'true';
+    this.#container.innerHTML = `
+      <tr>
+        <td colspan="7" class="text-center align-middle py-4">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+        </td>
+      </tr>
+    `;
+  }
+
+  hideLoading() {
+    if (this.#container.dataset.loading === 'true') {
+      this.#container.innerHTML = '';
+      this.#container.dataset.loading = 'false';
+    }
   }
 
   renderPagination(totalPages, currentPage, onPageChange) {
@@ -396,7 +412,11 @@ export class BooksView {
     btnAdd.className = 'btn btn-success';
     btnAdd.textContent = 'Add book';
     btnAdd.title = 'Add a new book';
-    btnAdd.addEventListener('click', () => this.onAdd && this.onAdd());
+    btnAdd.addEventListener('click', () => {
+      if (this.#userName === undefined || this.#userName === '')
+        return alert('Please enter your name');
+      if (this.onAdd) this.onAdd();
+    });
 
     divActions.appendChild(btnAdd);
     divActions.appendChild(btnClear);
