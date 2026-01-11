@@ -3,7 +3,28 @@
     ViewData["Title"] = "Books";
 }
 
-<div class="container">
-    <h1 class="display-5">Books</h1>
-    <p class="lead">Start here and add your catalog or data source.</p>
+<div class="container mt-5">
+    <h1 class="text-center mb-0" id="title">Library</h1>
+
+    <table class="table table-striped mt-4">
+        <thead class="table-dark">
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Book Title</th>
+                <th scope="col">Author</th>
+                <th scope="col">Year</th>
+                <th scope="col">Genre</th>
+                <th scope="col">Pages</th>
+                <th scope="col">Actions</th>
+            </tr>
+        </thead>
+        <tbody id="books-table-body"></tbody>
+    </table>
+    <nav>
+        <ul id="pagination" class="pagination justify-content-center"></ul>
+    </nav>
 </div>
+
+@section Scripts {
+    <script type="module" src="~/js/main.js"></script>
+}

@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "c:\\GitHub\\library\\MyRazorApp\\Library.csproj": {}
+    "C:\\GitHub\\library\\MyRazorApp\\Library.csproj": {}
   },
   "projects": {
-    "c:\\GitHub\\library\\MyRazorApp\\Library.csproj": {
+    "C:\\GitHub\\library\\MyRazorApp\\Library.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "c:\\GitHub\\library\\MyRazorApp\\Library.csproj",
+        "projectUniqueName": "C:\\GitHub\\library\\MyRazorApp\\Library.csproj",
         "projectName": "Library",
-        "projectPath": "c:\\GitHub\\library\\MyRazorApp\\Library.csproj",
+        "projectPath": "C:\\GitHub\\library\\MyRazorApp\\Library.csproj",
         "packagesPath": "C:\\Users\\maryo\\.nuget\\packages\\",
-        "outputPath": "c:\\GitHub\\library\\MyRazorApp\\obj\\",
+        "outputPath": "C:\\GitHub\\library\\MyRazorApp\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\maryo\\AppData\\Roaming\\NuGet\\NuGet.Config"
