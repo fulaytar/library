@@ -45,7 +45,42 @@ export class FormModal extends Modal {
       onConfirm: () => {
         const form = document.querySelector('#book-form');
         const data = new FormData(form);
+        const original = {
+          title: (book.title || '').trim(),
+          author:
+            ((book.details && book.details.author) || book.author || '').trim(),
+          year: Number(book.year) || 0,
+          genre: ((book.details && book.details.genre) || book.genre || '').trim(),
+          pages:
+            Number(
+              (book.details && book.details.pages) !== undefined
+                ? book.details.pages
+                : book.pages
+            ) || 0,
+        };
 
+        const current = {
+          title: String(data.get('title') || '').trim(),
+          author: String(data.get('author') || '').trim(),
+          year: Number(data.get('year')) || 0,
+          genre: String(data.get('genre') || '').trim(),
+          pages: Number(data.get('pages')) || 0,
+        };
+
+        const checkTitle = current.title === original.title;
+        const checkAuthor = current.author === original.author;
+        const checkYear = current.year === original.year;
+        const checkGenre = current.genre === original.genre;
+        const checkPages = current.pages === original.pages;
+        if (
+          checkTitle &&
+          checkAuthor &&
+          checkYear &&
+          checkGenre &&
+          checkPages
+        ) {
+          return alert('No changes made'); // No changes made
+        }
         const newBook = {
           title: data.get('title'),
           year: Number(data.get('year')),
