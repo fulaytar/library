@@ -20,6 +20,8 @@ export class BooksModel {
       if (genre) normalized.genre = genre;
       if (pages !== undefined) normalized.pages = pages;
     }
+    // ensure history array exists
+    if (!Array.isArray(normalized.history)) normalized.history = [];
     return normalized;
   }
 
@@ -91,7 +93,7 @@ export class BooksModel {
     });
   }
 
-  addBook(book) {
+  addBook(book, creator = 'unknown') {
     if (!book) return;
 
     const nb = this._normalizeBook(book);
@@ -102,6 +104,21 @@ export class BooksModel {
       alert('Some required fields are missing. Book was not added.');
       return;
     }
+
+    // Add initial history entry for creation
+    nb.history = nb.history || [];
+    nb.history.push({
+      ts: new Date().toISOString(),
+      editor: creator || 'unknown',
+      changes: [
+        { field: 'title', from: '', to: title },
+        { field: 'year', from: '', to: year },
+        { field: 'author', from: '', to: author },
+        { field: 'genre', from: '', to: genre },
+        { field: 'pages', from: '', to: pages },
+      ],
+    });
+
     this.allBooks.push(nb);
     this.applyFiltersAndSearch();
   }
@@ -136,12 +153,91 @@ export class BooksModel {
     return this.books;
   }
 
-  editBook(index, newBook) {
+  editBook(index, newBook, editor = 'unknown') {
     const globalIndex = (this.currentPage - 1) * this.perPage + index;
     const nb = this._normalizeBook(newBook);
-    this.books[index] = nb;
-    if (this.allBooks[globalIndex]) this.allBooks[globalIndex] = nb;
-    if (this.filteredBooks[globalIndex]) this.filteredBooks[globalIndex] = nb;
+
+    const oldGlobal =
+      this.allBooks[globalIndex] || this.filteredBooks[globalIndex] || null;
+
+    // compute changes
+    const changes = [];
+    if (oldGlobal) {
+      if ((oldGlobal.title || '') !== (nb.title || ''))
+        changes.push({
+          field: 'title',
+          from: oldGlobal.title || '',
+          to: nb.title || '',
+        });
+      if ((oldGlobal.year || '') !== (nb.year || ''))
+        changes.push({
+          field: 'year',
+          from: oldGlobal.year || '',
+          to: nb.year || '',
+        });
+
+      const oldAuthor =
+        oldGlobal.author ||
+        (oldGlobal.details && oldGlobal.details.author) ||
+        '';
+      const newAuthor = nb.author || (nb.details && nb.details.author) || '';
+      if (oldAuthor !== newAuthor)
+        changes.push({ field: 'author', from: oldAuthor, to: newAuthor });
+
+      const oldGenre =
+        oldGlobal.genre || (oldGlobal.details && oldGlobal.details.genre) || '';
+      const newGenre = nb.genre || (nb.details && nb.details.genre) || '';
+      if (oldGenre !== newGenre)
+        changes.push({ field: 'genre', from: oldGenre, to: newGenre });
+
+      const oldPages =
+        (oldGlobal.pages !== undefined
+          ? oldGlobal.pages
+          : oldGlobal.details && oldGlobal.details.pages) || '';
+      const newPages =
+        (nb.pages !== undefined ? nb.pages : nb.details && nb.details.pages) ||
+        '';
+      if (String(oldPages) !== String(newPages))
+        changes.push({ field: 'pages', from: oldPages, to: newPages });
+    }
+
+    if (changes.length > 0) {
+      const entry = {
+        ts: new Date().toISOString(),
+        editor: editor || 'unknown',
+        changes,
+      };
+      // attach to allBooks if present, otherwise to oldGlobal
+      if (this.allBooks[globalIndex]) {
+        if (!Array.isArray(this.allBooks[globalIndex].history))
+          this.allBooks[globalIndex].history = [];
+        this.allBooks[globalIndex].history.push(entry);
+      } else if (oldGlobal) {
+        if (!Array.isArray(oldGlobal.history)) oldGlobal.history = [];
+        oldGlobal.history.push(entry);
+      }
+    }
+
+    // replace references and preserve history if present
+    const historyToPreserve =
+      (this.allBooks[globalIndex] && this.allBooks[globalIndex].history) ||
+      (oldGlobal && oldGlobal.history) ||
+      [];
+
+    // ensure the object used in current page has the history attached
+    nb.history = Array.isArray(historyToPreserve)
+      ? historyToPreserve.slice()
+      : [];
+
+    this.books[index] = Object.assign({}, nb);
+    if (this.allBooks[globalIndex]) {
+      this.allBooks[globalIndex] = Object.assign({}, nb);
+      this.allBooks[globalIndex].history = historyToPreserve;
+    }
+    if (this.filteredBooks[globalIndex]) {
+      this.filteredBooks[globalIndex] = Object.assign({}, nb);
+      this.filteredBooks[globalIndex].history = historyToPreserve;
+    }
   }
 
   detailsBook(index) {

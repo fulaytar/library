@@ -539,7 +539,8 @@ export class BooksView {
       input.type = 'text';
       input.id = 'header-name-input';
       input.placeholder = 'Please enter your name';
-      input.className = 'form-control d-inline-block w-auto header-name-input';
+      input.className =
+        'form-control d-inline-block w-auto header-name-input me-2';
 
       input.addEventListener('keydown', e => {
         if (e.key === 'Enter') {
@@ -580,6 +581,11 @@ export class BooksView {
     container.textContent = `Total books: ${totalBooks}${
       topGenres ? ' • ' + topGenres : ''
     }`;
+  }
+
+  // Public getter for current username (empty string if not set)
+  getUserName() {
+    return this.#userName || '';
   }
 
   renderFilters(genres = [], selectedGenre = '') {

@@ -8,7 +8,10 @@ export class BooksController {
   constructor(model, view) {
     this.model = model;
     this.view = view;
-    this.model.setAllBooks(books);
+    this.storageKey = 'library_books';
+
+    const storedBooks = this.loadStoredBooks();
+    this.model.setAllBooks(storedBooks || books);
 
     this.view.renderFilters(
       this.model.getGenres(),
@@ -55,8 +58,13 @@ export class BooksController {
       const book = this.model.getBooks()[index];
       new FormModal({
         book,
+        genres: this.model.getGenres(),
         onConfirm: updatedBook => {
-          this.model.editBook(index, updatedBook);
+          const editor = this.view.getUserName
+            ? this.view.getUserName()
+            : 'unknown';
+          this.model.editBook(index, updatedBook, editor);
+          this.saveBooks();
           this.updateView();
         },
       }).open();
@@ -64,8 +72,13 @@ export class BooksController {
 
     this.view.onAdd = () => {
       new AddModal({
+        genres: this.model.getGenres(),
         onConfirm: newBook => {
-          this.model.addBook(newBook);
+          const creator = this.view.getUserName
+            ? this.view.getUserName()
+            : 'unknown';
+          this.model.addBook(newBook, creator);
+          this.saveBooks();
           this.updateView();
         },
       }).open();
@@ -75,11 +88,35 @@ export class BooksController {
       const book = this.model.getBooks()[index];
       new DeleteModal(book, () => {
         this.model.deleteBook(index);
+        this.saveBooks();
         this.updateView();
       }).open();
     };
 
     this.updateView();
+  }
+
+  loadStoredBooks() {
+    try {
+      const raw = localStorage.getItem(this.storageKey);
+      if (!raw) return null;
+      const parsed = JSON.parse(raw);
+      return Array.isArray(parsed) ? parsed : null;
+    } catch (err) {
+      console.error('Failed to load stored books', err);
+      return null;
+    }
+  }
+
+  saveBooks() {
+    try {
+      localStorage.setItem(
+        this.storageKey,
+        JSON.stringify(this.model.allBooks)
+      );
+    } catch (err) {
+      console.error('Failed to save books', err);
+    }
   }
 
   changePage(page) {

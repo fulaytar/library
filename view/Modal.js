@@ -4,7 +4,7 @@ export class Modal {
     body = '',
     confirmText = 'OK',
     onConfirm = null,
-    cancelText = 'Відміна',
+    cancelText = 'Cancel',
   }) {
     this.title = title;
     this.body = body;
