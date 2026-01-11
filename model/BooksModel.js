@@ -121,6 +121,7 @@ export class BooksModel {
 
     this.allBooks.push(nb);
     this.applyFiltersAndSearch();
+    return nb;
   }
 
   deleteBook(index) {

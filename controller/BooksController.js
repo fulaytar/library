@@ -73,8 +73,9 @@ export class BooksController {
             : 'unknown';
           try {
             if (this.view.showLoading) this.view.showLoading();
-            await this.api.update(book, updatedBook);
             this.model.editBook(index, updatedBook, editor);
+            const updatedWithHistory = this.model.getBooks()[index];
+            await this.api.update(book, updatedWithHistory);
             this.updateView();
           } catch (err) {
             console.error('Failed to update book', err);
@@ -96,7 +97,13 @@ export class BooksController {
           try {
             if (this.view.showLoading) this.view.showLoading();
             const created = await this.api.create(newBook);
-            this.model.addBook(created || newBook, creator);
+            const createdWithHistory = this.model.addBook(
+              created || newBook,
+              creator
+            );
+            if (createdWithHistory) {
+              await this.api.update(created || newBook, createdWithHistory);
+            }
             this.updateView();
           } catch (err) {
             console.error('Failed to create book', err);

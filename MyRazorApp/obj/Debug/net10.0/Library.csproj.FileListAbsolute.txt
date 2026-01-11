@@ -97,13 +97,13 @@ C:\GitHub\library\MyRazorApp\obj\Debug\net10.0\Library.pdb
 C:\GitHub\library\MyRazorApp\obj\Debug\net10.0\Library.genruntimeconfig.cache
 C:\GitHub\library\MyRazorApp\obj\Debug\net10.0\ref\Library.dll
 C:\GitHub\library\MyRazorApp\obj\Debug\net10.0\compressed\pblqhxp35l-{0}-wkyyflc8q2-wkyyflc8q2.gz
-C:\GitHub\library\MyRazorApp\obj\Debug\net10.0\compressed\on8c1ppz2a-{0}-v94v6oc6av-v94v6oc6av.gz
 C:\GitHub\library\MyRazorApp\obj\Debug\net10.0\compressed\wwnyv6jhdk-{0}-i18ibz54ov-i18ibz54ov.gz
 C:\GitHub\library\MyRazorApp\obj\Debug\net10.0\compressed\gg9rcq3cl2-{0}-8bkazogpx7-8bkazogpx7.gz
-C:\GitHub\library\MyRazorApp\obj\Debug\net10.0\compressed\pijvzsme31-{0}-hhw6qe0qde-hhw6qe0qde.gz
 C:\GitHub\library\MyRazorApp\obj\Debug\net10.0\compressed\cew85bdiwe-{0}-kk7zhkpyqn-kk7zhkpyqn.gz
 C:\GitHub\library\MyRazorApp\obj\Debug\net10.0\compressed\7u9whkdegv-{0}-dbd7t0jztc-dbd7t0jztc.gz
 C:\GitHub\library\MyRazorApp\obj\Debug\net10.0\compressed\1frxpa50fe-{0}-253d71941y-253d71941y.gz
 C:\GitHub\library\MyRazorApp\obj\Debug\net10.0\compressed\ic0lcx6jv4-{0}-5yqpmm90hl-5yqpmm90hl.gz
 C:\GitHub\library\MyRazorApp\obj\Debug\net10.0\compressed\uoa15a75uo-{0}-5l030uzdtm-5l030uzdtm.gz
 C:\GitHub\library\MyRazorApp\obj\Debug\net10.0\compressed\y9ivxa5i8j-{0}-feg88r4r1i-feg88r4r1i.gz
+C:\GitHub\library\MyRazorApp\obj\Debug\net10.0\compressed\on8c1ppz2a-{0}-irvk8i4j71-irvk8i4j71.gz
+C:\GitHub\library\MyRazorApp\obj\Debug\net10.0\compressed\pijvzsme31-{0}-a3jryjfgqr-a3jryjfgqr.gz
