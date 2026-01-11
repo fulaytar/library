@@ -62,7 +62,7 @@ export class Modal {
         const inst = bootstrap.Modal.getInstance(modal);
         if (inst) inst.dispose();
       } catch (e) {
-        // ignore
+        console.error('Error disposing modal instance', e);
       }
       if (modal.parentNode) modal.parentNode.removeChild(modal);
     });
@@ -99,7 +99,7 @@ export class Modal {
         document.activeElement.blur();
       }
     } catch (e) {
-      // ignore
+      console.error('Error removing focus from modal', e);
     }
 
     // Hide modal via Bootstrap. The hidden handler attached in createModal

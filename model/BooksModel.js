@@ -209,5 +209,15 @@ export class BooksModel {
       mimeType: 'text/csv;charset=utf-8;',
     };
   }
+
+  getAnalytics() {
+    const totalBooks = this.allBooks.length;
+    const genres = {};
+    this.allBooks.forEach(b => {
+      const g = b.genre || (b.details && b.details.genre) || 'Unknown';
+      genres[g] = (genres[g] || 0) + 1;
+    });
+    return { totalBooks, genres };
+  }
 }
 /* Робота з даними  */

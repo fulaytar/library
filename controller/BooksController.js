@@ -97,6 +97,11 @@ export class BooksController {
       this.model.perPage
     );
 
+    // header + analytics
+    if (this.view.renderHeader) this.view.renderHeader({ userName: 'Guest' });
+    if (this.view.renderAnalytics)
+      this.view.renderAnalytics(this.model.getAnalytics());
+
     this.view.renderPagination(
       totalPages,
       this.model.currentPage,

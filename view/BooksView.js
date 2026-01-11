@@ -1,6 +1,8 @@
 export class BooksView {
+  #container;
+  #userName;
   constructor(container) {
-    this.container = container;
+    this.#container = container;
     this.onPageChange = null;
     this.onSearch = null;
 
@@ -17,7 +19,7 @@ export class BooksView {
   }
 
   render(books, currentPage, perPage) {
-    this.container.innerHTML = `
+    this.#container.innerHTML = `
   <tr>
     <td colspan="7" class="text-center align-middle py-4">
       <div class="spinner-border text-primary" role="status">
@@ -27,7 +29,7 @@ export class BooksView {
   </tr>
 `;
     setTimeout(() => {
-      this.container.innerHTML = '';
+      this.#container.innerHTML = '';
 
       books.forEach((book, index) => {
         const tr = document.createElement('tr');
@@ -75,22 +77,29 @@ export class BooksView {
         const tdAButtons = document.createElement('td');
 
         const btnDetails = document.createElement('button');
-        btnDetails.textContent = 'Details';
         btnDetails.className = 'btn btn-sm btn-info me-1';
+        btnDetails.setAttribute('title', 'Details');
+        btnDetails.setAttribute('aria-label', 'View details');
+        btnDetails.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>`;
         btnDetails.addEventListener('click', () => {
           if (this.onDetails) this.onDetails(index);
         });
 
         const btnEdit = document.createElement('button');
-        btnEdit.textContent = 'Edit';
         btnEdit.className = 'btn btn-sm btn-warning me-1';
+        btnEdit.setAttribute('title', 'Edit');
+        btnEdit.setAttribute('aria-label', 'Edit book');
+        // quill / feather icon (inline SVG, using currentColor)
+        btnEdit.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 21l1.5-4.5L17.5 3.5l3 3L7.5 20.5 3 21zM20.7 7.3l-4-4 1.4-1.4 4 4-1.4 1.4z"/></svg>`;
         btnEdit.addEventListener('click', () => {
           if (this.onEdit) this.onEdit(index);
         });
 
         const btnDelete = document.createElement('button');
-        btnDelete.textContent = 'Delete';
         btnDelete.className = 'btn btn-sm btn-danger me-1';
+        btnDelete.setAttribute('title', 'Delete');
+        btnDelete.setAttribute('aria-label', 'Delete book');
+        btnDelete.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6 7h12v13a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V7zm3-4h6l1 1H8l1-1zM9 9v9h2V9H9zm4 0v9h2V9h-2z"/></svg>`;
         btnDelete.addEventListener('click', () => {
           if (this.onDelete) this.onDelete(index);
         });
@@ -105,7 +114,7 @@ export class BooksView {
         tr.appendChild(tdPages);
         tr.appendChild(tdAButtons);
 
-        this.container.appendChild(tr);
+        this.#container.appendChild(tr);
       });
     }, 500);
   }
@@ -116,7 +125,7 @@ export class BooksView {
       paginationContainer = document.createElement('ul');
       paginationContainer.id = 'pagination';
       paginationContainer.className = 'pagination justify-content-center';
-      this.container.parentNode.appendChild(paginationContainer);
+      this.#container.parentNode.appendChild(paginationContainer);
     }
     paginationContainer.innerHTML = '';
 
@@ -240,7 +249,7 @@ export class BooksView {
     inputAuthor.id = 'filter-author';
     inputAuthor.className = 'form-control';
     inputAuthor.placeholder = 'Author';
-    inputAuthor.addEventListener('input', () => this._triggerFilter());
+    inputAuthor.addEventListener('input', () => this.#triggerFilter());
     divAuthor.appendChild(inputAuthor);
 
     // Genre filter
@@ -257,7 +266,7 @@ export class BooksView {
     // accessibility attribute (English label as requested)
     genreSelect.setAttribute('aria-label', 'Genre');
     genreSelect.addEventListener('change', () => {
-      this._triggerFilter();
+      this.#triggerFilter();
     });
 
     divGenre.appendChild(genreSelect);
@@ -287,7 +296,7 @@ export class BooksView {
     yearFrom.addEventListener('input', () => {
       if (yearFrom.value !== '')
         yearFrom.value = yearFrom.value.replace(/[^\d]/g, '');
-      this._triggerFilter();
+      this.#triggerFilter();
     });
     divYearFrom.appendChild(yearFrom);
 
@@ -312,7 +321,7 @@ export class BooksView {
     yearTo.addEventListener('input', () => {
       if (yearTo.value !== '')
         yearTo.value = yearTo.value.replace(/[^\d]/g, '');
-      this._triggerFilter();
+      this.#triggerFilter();
     });
     divYearTo.appendChild(yearTo);
 
@@ -324,6 +333,7 @@ export class BooksView {
     btnClear.type = 'button';
     btnClear.className = 'btn btn-outline-secondary';
     btnClear.textContent = 'Clear';
+    btnClear.title = 'Clear search and filters';
 
     btnClear.addEventListener('click', () => {
       // Read current values
@@ -351,6 +361,7 @@ export class BooksView {
     exportWrapper.className = 'btn-group';
 
     const exportBtn = document.createElement('button');
+    exportBtn.title = 'Export books';
     exportBtn.className = 'btn btn-outline-primary dropdown-toggle';
     exportBtn.setAttribute('data-bs-toggle', 'dropdown');
     exportBtn.textContent = 'Export';
@@ -384,6 +395,7 @@ export class BooksView {
     btnAdd.type = 'button';
     btnAdd.className = 'btn btn-success';
     btnAdd.textContent = 'Add book';
+    btnAdd.title = 'Add a new book';
     btnAdd.addEventListener('click', () => this.onAdd && this.onAdd());
 
     divActions.appendChild(btnAdd);
@@ -403,6 +415,171 @@ export class BooksView {
 
     const prependTable = document.querySelector('#title');
     prependTable.insertAdjacentElement('afterend', container);
+  }
+
+  // Public: render top info header (user name)
+  renderHeader({ userName = '' } = {}) {
+    let header = document.getElementById('top-info');
+    if (!header) {
+      header = document.createElement('div');
+      header.id = 'top-info';
+      header.className =
+        'd-flex justify-content-between align-items-center mb-3';
+      const prependTarget = document.querySelector('#title');
+      prependTarget.insertAdjacentElement('afterend', header);
+    }
+
+    // Restore from localStorage if available
+    if (!this.#userName) {
+      try {
+        const stored = localStorage.getItem('library_userName');
+        if (stored) this.#userName = stored;
+      } catch (e) {
+        console.error('Failed to access localStorage', e);
+      }
+    }
+
+    header.innerHTML = '';
+
+    // Inject small stylesheet for header if not present (keeps inline styles out of DOM)
+    if (!document.getElementById('booksview-header-styles')) {
+      const styleEl = document.createElement('style');
+      styleEl.id = 'booksview-header-styles';
+      styleEl.textContent =
+        '.header-name-input { min-width: 160px; } .header-name-error { color: #dc3545; font-size: 0.875rem; margin-top: 0.25rem; }';
+      document.head.appendChild(styleEl);
+    }
+
+    const left = document.createElement('div');
+    const right = document.createElement('div');
+    left.className = 'd-flex align-items-center';
+    right.id = 'analytics-summary';
+    right.className = 'text-muted small';
+
+    const saveName = () => {
+      const input = document.getElementById('header-name-input');
+      if (!input) return;
+      const v = input.value.trim();
+
+      // Validation: disallow digits in name
+      const hasDigits = /\d/.test(v);
+      let errEl = document.getElementById('header-name-error');
+
+      if (!v) {
+        if (!errEl) {
+          errEl = document.createElement('div');
+          errEl.id = 'header-name-error';
+          errEl.className = 'header-name-error';
+          errEl.textContent = 'Please enter your name';
+          input.insertAdjacentElement('afterend', errEl);
+        } else {
+          errEl.textContent = 'Please enter your name';
+          errEl.classList.add('d-block');
+        }
+        input.classList.add('is-invalid');
+        return;
+      }
+
+      if (hasDigits) {
+        if (!errEl) {
+          errEl = document.createElement('div');
+          errEl.id = 'header-name-error';
+          errEl.className = 'header-name-error';
+          errEl.textContent = 'Name cannot contain numbers';
+          input.insertAdjacentElement('afterend', errEl);
+        } else {
+          errEl.textContent = 'Name cannot contain numbers';
+          errEl.classList.add('d-block');
+        }
+        input.classList.add('is-invalid');
+        return;
+      }
+
+      // Clear any previous error
+      if (errEl) {
+        errEl.remove();
+      }
+      input.classList.remove('is-invalid');
+
+      this.#userName = v;
+      try {
+        localStorage.setItem('library_userName', v);
+      } catch (e) {
+        console.error('Failed to access localStorage', e);
+      }
+      this.renderHeader();
+    };
+
+    if (this.#userName) {
+      const strong = document.createElement('strong');
+      strong.textContent = `Welcome, ${this.#userName}`;
+      left.appendChild(strong);
+
+      const editBtn = document.createElement('button');
+      editBtn.type = 'button';
+      editBtn.className = 'btn btn-link btn-sm ms-2';
+      editBtn.setAttribute('title', 'Edit name');
+      editBtn.setAttribute('aria-label', 'Edit name');
+      editBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 21l1.5-4.5L17.5 3.5l3 3L7.5 20.5 3 21zM20.7 7.3l-4-4 1.4-1.4 4 4-1.4 1.4z"/></svg>`;
+      editBtn.addEventListener('click', () => {
+        this.#userName = '';
+        try {
+          localStorage.removeItem('library_userName');
+        } catch (e) {}
+        this.renderHeader();
+      });
+      left.appendChild(editBtn);
+    } else {
+      const label = document.createElement('label');
+      label.htmlFor = 'header-name-input';
+      label.className = 'me-0 mb-0';
+      label.textContent = '';
+
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.id = 'header-name-input';
+      input.placeholder = 'Please enter your name';
+      input.className = 'form-control d-inline-block w-auto header-name-input';
+
+      input.addEventListener('keydown', e => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          saveName();
+        }
+      });
+
+      input.addEventListener('input', () => {
+        input.classList.remove('is-invalid');
+        const err = document.getElementById('header-name-error');
+        if (err) err.remove();
+      });
+
+      input.addEventListener('blur', () => saveName());
+
+      left.appendChild(label);
+      left.appendChild(input);
+
+      // focus promptly
+      setTimeout(() => input.focus(), 0);
+    }
+
+    header.appendChild(left);
+    header.appendChild(right);
+  }
+
+  // Public: render analytics data
+  renderAnalytics(analytics = { totalBooks: 0, genres: {} }) {
+    const container = document.getElementById('analytics-summary');
+    if (!container) return;
+    const { totalBooks, genres } = analytics;
+    const genrePairs = Object.entries(genres).sort((a, b) => b[1] - a[1]);
+    const topGenres = genrePairs
+      .slice(0, 3)
+      .map(([g, c]) => `${g}: ${c}`)
+      .join(' • ');
+    container.textContent = `Total books: ${totalBooks}${
+      topGenres ? ' • ' + topGenres : ''
+    }`;
   }
 
   renderFilters(genres = [], selectedGenre = '') {
@@ -442,7 +619,7 @@ export class BooksView {
     }
   }
 
-  _triggerFilter() {
+  #triggerFilter() {
     const author = (document.getElementById('filter-author') || {}).value || '';
     const genre = (document.getElementById('filter-genre') || {}).value || '';
     const yearFrom =
